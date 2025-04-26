@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary-rgb: 29, 161, 242;
+    --color-primary: rgb(var(--color-primary-rgb));
+    --color-secondary: #657786;
+    --color-background: #F7F9FA;
+    --color-border: #E1E8ED;
+    --color-text: #14171A;
+  }
+
+  body {
+    @apply bg-[--color-background] text-[--color-text] antialiased min-h-screen;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  #root {
+    @apply min-h-screen flex flex-col;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply btn bg-[--color-primary] text-white hover:bg-primary-90 focus:ring-primary/50;
+  }
+
+  .btn-secondary {
+    @apply btn bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-gray-400/50;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-[--color-border] transition-all duration-200;
+  }
+
+  .card-hover {
+    @apply hover:shadow-md hover:border-[--color-border] hover:border-opacity-80;
+  }
+
+  .chess-board-container {
+    @apply relative mx-auto;
+    width: min(calc(100vw - 2rem), min(600px, 80vh));
+    aspect-ratio: 1;
+  }
+
+  .progress-bar-container {
+    @apply relative bg-gray-100 rounded-lg overflow-hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .progress-bar-fill {
+    @apply absolute bottom-0 left-0 right-0 bg-green-500 transition-all duration-500 ease-out;
+  }
+
+  .brand-text {
+    @apply font-bold tracking-wide;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  @media (max-width: 640px) {
+    .chess-board-container {
+      width: min(calc(100vw - 2rem), 100%);
+      margin: 0 auto;
+    }
+
+    .mobile-progress-bar {
+      @apply h-2 w-full mt-4;
+    }
+
+    .card {
+      @apply p-3;
+    }
+
+    h1 {
+      @apply text-xl;
+    }
+
+    h2 {
+      @apply text-lg;
+    }
+
+    .btn {
+      @apply px-3 py-1.5 text-sm;
+    }
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes container-scale {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes text-glow {
+  0%, 100% {
+    filter: brightness(100%);
+    transform: scale(1);
+  }
+  50% {
+    filter: brightness(120%);
+    transform: scale(1.05);
+  }
+}
+
+canvas {
+  z-index: 40 !important;
+}
+
+.main-content {
+  @apply flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6;
+}
+
+.footer-container {
+  @apply mt-auto;
+}

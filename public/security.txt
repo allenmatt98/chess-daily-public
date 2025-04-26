@@ -1,0 +1,5 @@
+Contact: mailto:security@yourdomain.com
+Expires: 2025-12-31T23:59:59.000Z
+Preferred-Languages: en
+Policy: https://yourdomain.com/security-policy
+Purpose: These are the security policies for this website.
