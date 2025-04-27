@@ -1,13 +1,12 @@
-export interface ChessMove {
-  from: string;
-  to: string;
-  promotion?: string;
-}
+import type { Square } from 'chess.js';
+import type { UserStats } from './lib/puzzleService';
+import type { Database } from './lib/database.types';
 
-export interface ChessPuzzle {
-  fen: string;
-  pgn: string;
-  metadata: {
+export type ChessPuzzle = Database['public']['Tables']['puzzles']['Row'] & {
+  id: string;
+  moves: ChessMove[];
+  nextRotation?: string;
+  metadata?: {
     white: string;
     black: string;
     result: string;
@@ -18,7 +17,17 @@ export interface ChessPuzzle {
     timeLimit: number;
     absolute_number: number;
   };
-  moves: ChessMove[];
+};
+
+export interface ChessMove {
+  from: Square;
+  to: Square;
+  promotion?: string;
+}
+
+export interface ChessPuzzleProps {
+  puzzle: ChessPuzzle;
+  onComplete?: (timeTaken: number, hintsUsed: number) => Promise<UserStats | null>;
 }
 
 export interface GuestPuzzleTime {

@@ -49,66 +49,30 @@ export async function updatePuzzleProgress(
   timeTaken: number,
   hintsUsed: number
 ): Promise<UserStats | null> {
+  console.log('Updating puzzle progress:', {
+    userId,
+    puzzleId,
+    timeTaken,
+    hintsUsed,
+    timestamp: new Date().toISOString()
+  });
+
   try {
-    console.log('Updating puzzle progress:', { 
-      userId, 
-      puzzleId, 
-      timeTaken, 
-      hintsUsed,
-      timestamp: new Date().toISOString()
+    const { data, error } = await supabase.rpc('update_puzzle_progress', {
+      p_user_id: userId,
+      p_puzzle_id: puzzleId,
+      p_time_taken: timeTaken,
+      p_hints_used: hintsUsed,
+      p_completed: true,
+      p_solution_viewed: false
     });
-    
-    const { data: rawData, error } = await supabase
-      .rpc('update_puzzle_progress', {
-        p_user_id: userId,
-        p_puzzle_id: puzzleId,
-        p_time_taken: timeTaken,
-        p_hints_used: hintsUsed,
-        p_completed: true, // Add completed parameter
-        p_solution_viewed: false // Add solution_viewed parameter
-      });
 
     if (error) {
       console.error('Error updating puzzle progress:', error);
-      throw error;
+      return null;
     }
 
-    console.log('Progress update response:', {
-      rawData,
-      timestamp: new Date().toISOString()
-    });
-
-    if (!rawData) {
-      console.error('No data returned from progress update');
-      throw new Error('No data returned from progress update');
-    }
-
-    // Parse the JSON response if it's a string
-    const data = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
-
-    // Check for error message
-    if (data.error) {
-      return {
-        rating: 0,
-        currentStreak: 0,
-        highestStreak: 0,
-        error: data.error,
-        canUpdateRating: false
-      };
-    }
-
-    // Parse and validate the response using camelCase property names
-    const parsedStats: UserStats = {
-      rating: Number(data.rating),
-      currentStreak: Number(data.currentStreak),
-      highestStreak: Number(data.highestStreak),
-      previousRating: Number(data.previousRating),
-      canUpdateRating: data.canUpdateRating
-    };
-
-    console.log('Parsed stats:', parsedStats);
-
-    return parsedStats;
+    return data as UserStats;
   } catch (error) {
     console.error('Error in updatePuzzleProgress:', error);
     return null;
@@ -118,24 +82,47 @@ export async function updatePuzzleProgress(
 export async function getDailyPuzzle(): Promise<PuzzleResponse> {
   try {
     const { data, error } = await supabase
-      .rpc('get_daily_puzzle')
-      .single();
+      .rpc('get_daily_puzzle');
 
     if (error) {
-      console.error('Error fetching puzzle:', error);
+      console.error('Error getting daily puzzle:', error);
       throw error;
     }
 
-    if (!data || !data.puzzle) {
-      throw new Error('No puzzle data returned');
+    console.log('Daily puzzle data:', data); // Debug log
+
+    // Get first puzzle from the array
+    const puzzleData = Array.isArray(data) && data.length > 0 ? data[0] : null;
+    
+    if (!puzzleData) {
+      throw new Error('No puzzle available');
+    }
+
+    // Extract the actual puzzle from the nested structure
+    const puzzle = puzzleData.puzzle;
+
+    // Validate required fields
+    if (!puzzle?.fen || !puzzle?.pgn) {
+      console.error('Invalid puzzle data - missing required fields:', puzzleData);
+      throw new Error('Invalid puzzle data - missing required fields');
+    }
+
+    // Get next rotation time
+    const { data: rotationData, error: rotationError } = await supabase
+      .rpc('get_next_interval_change')
+      .single();
+
+    if (rotationError) {
+      console.error('Error getting next rotation:', rotationError);
+      throw rotationError;
     }
 
     return {
-      puzzle: data.puzzle,
-      next_rotation: data.next_rotation
+      puzzle: puzzle as Puzzle,
+      next_rotation: rotationData as string
     };
   } catch (error) {
-    console.error('Failed to fetch daily puzzle:', error);
+    console.error('Error in getDailyPuzzle:', error);
     throw error;
   }
 }

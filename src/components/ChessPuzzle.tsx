@@ -1,14 +1,28 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
-import { Chess } from 'chess.js';
+import { Chess, Square } from 'chess.js';
 import { VictoryCelebration } from './VictoryCelebration';
 import { useAuthStore } from '../store/authStore';
 import { updateGuestStats } from '../lib/guestStats';
 import { savePuzzleCompletion, getPuzzleCompletion } from '../lib/completionStorage';
-import type { ChessPuzzleProps, ChessMove } from '../types';
+import type { ChessPuzzleProps } from '../types';
 import type { UserStats } from '../lib/puzzleService';
 
 export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
+  console.log('ChessPuzzle received props:', { puzzle }); // Debug log
+
+  // Early return if puzzle or required fields are missing
+  if (!puzzle?.fen) {
+    console.log('Missing puzzle or FEN, showing loading state'); // Debug log
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-lg text-gray-600">Loading puzzle...</p>
+      </div>
+    );
+  }
+
+  console.log('Initializing ChessPuzzle with FEN:', puzzle.fen); // Debug log
+
   const [game, setGame] = useState(new Chess(puzzle.fen));
   const [currentMoveIndex, setCurrentMoveIndex] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -115,7 +129,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     if (puzzle.nextRotation) {
       const updateTimeUntilRotation = () => {
         const now = new Date();
-        const rotationTime = new Date(puzzle.nextRotation);
+        const rotationTime = puzzle.nextRotation ? new Date(puzzle.nextRotation) : now;
         const diffHours = Math.max(0, Math.floor((rotationTime.getTime() - now.getTime()) / (1000 * 60 * 60)));
         const diffMinutes = Math.max(0, Math.floor((rotationTime.getTime() - now.getTime()) / (1000 * 60)) % 60);
         
@@ -199,37 +213,37 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     }
   };
 
-  const isPromotion = (sourceSquare: string, targetSquare: string): boolean => {
-    const piece = game.get(sourceSquare);
+  const isPromotion = (fromSquare: Square, toSquare: Square): boolean => {
+    const piece = game.get(fromSquare);
     if (!piece || piece.type !== 'p') return false;
     
-    const targetRank = targetSquare.charAt(1);
+    const targetRank = toSquare.charAt(1);
     return (piece.color === 'w' && targetRank === '8') || 
            (piece.color === 'b' && targetRank === '1');
   };
 
-  const handleMove = (sourceSquare: string, targetSquare: string): boolean => {
+  const handleMove = (fromSquare: Square, toSquare: Square): boolean => {
     if (isCompleted) return false;
     
     const expectedMove = moveSequence[currentMoveIndex];
     if (!expectedMove) return false;
 
     // If it's a promotion move, let the promotion handler handle it
-    if (isPromotion(sourceSquare, targetSquare)) {
+    if (isPromotion(fromSquare, toSquare)) {
       return false; // Let the promotion handler handle this move
     }
 
     setActiveHint(null);
     setHintPhase(null);
     
-    if (expectedMove.from === sourceSquare && expectedMove.to === targetSquare) {
+    if (expectedMove.from === fromSquare && expectedMove.to === toSquare) {
       setWrongMove(false);
       const gameCopy = new Chess(game.fen());
       
       try {
         const moveOptions = {
-          from: sourceSquare,
-          to: targetSquare,
+          from: fromSquare,
+          to: toSquare,
           promotion: expectedMove.promotion
         };
 
@@ -268,19 +282,17 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     return false;
   };
 
-  const handlePromotion = (sourceSquare: string, targetSquare: string, piece: string): boolean => {
-    console.log('Handling promotion:', { sourceSquare, targetSquare, piece });
-    
-    if (!piece || isCompleted) return false;
+  const handlePromotion = (piece: string | undefined, fromSquare: Square | undefined, toSquare: Square | undefined): boolean => {
+    if (!piece || !fromSquare || !toSquare || isCompleted) return false;
     
     const expectedMove = moveSequence[currentMoveIndex];
     if (!expectedMove) return false;
 
     // Verify the source and target squares match the expected move
-    if (expectedMove.from !== sourceSquare || expectedMove.to !== targetSquare) {
+    if (expectedMove.from !== fromSquare || expectedMove.to !== toSquare) {
       console.log('Square mismatch:', {
         expected: { from: expectedMove.from, to: expectedMove.to },
-        received: { from: sourceSquare, to: targetSquare }
+        received: { from: fromSquare, to: toSquare }
       });
       setWrongMove(true);
       return false;
@@ -315,8 +327,8 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     
     try {
       const move = gameCopy.move({
-        from: sourceSquare,
-        to: targetSquare,
+        from: fromSquare,
+        to: toSquare,
         promotion: promotionType
       });
 
@@ -385,14 +397,31 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           streak: guestStats.currentStreak
         });
       } else if (onComplete) {
-        const stats = await onComplete(finalTimeRef.current, hintsUsed);
-        if (stats) {
-          setVictoryStats({
-            rating: stats.rating,
-            ratingChange: stats.rating - (stats.previousRating || stats.rating),
-            streak: stats.currentStreak
-          });
+        // For logged-in users, always show victory screen with current stats as fallback
+        let currentStats = {
+          rating: 1000,
+          previousRating: 1000,
+          currentStreak: 0
+        };
+
+        try {
+          const stats = await onComplete(finalTimeRef.current, hintsUsed);
+          if (stats) {
+            currentStats = {
+              rating: stats.rating,
+              previousRating: stats.previousRating || stats.rating,
+              currentStreak: stats.currentStreak
+            };
+          }
+        } catch (error) {
+          console.error('Error updating stats:', error);
         }
+
+        setVictoryStats({
+          rating: currentStats.rating,
+          ratingChange: currentStats.rating - currentStats.previousRating,
+          streak: currentStats.currentStreak
+        });
       }
       
       // Delay showing victory screen slightly to ensure state updates are complete
