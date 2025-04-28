@@ -130,9 +130,9 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       const updateTimeUntilRotation = () => {
         const now = new Date();
         const rotationTime = puzzle.nextRotation ? new Date(puzzle.nextRotation) : now;
-        const diffHours = Math.max(0, Math.floor((rotationTime.getTime() - now.getTime()) / (1000 * 60 * 60)));
-        const diffMinutes = Math.max(0, Math.floor((rotationTime.getTime() - now.getTime()) / (1000 * 60)) % 60);
-        
+        const diffMs = rotationTime.getTime() - now.getTime();
+        const diffHours = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60)));
+        const diffMinutes = Math.max(0, Math.floor((diffMs / (1000 * 60)) % 60));
         setTimeUntilRotation(`${diffHours}h ${diffMinutes}m`);
       };
 
