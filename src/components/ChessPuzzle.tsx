@@ -35,12 +35,12 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   } | null>(null);
   const [activeHint, setActiveHint] = useState<{ from: string; to: string } | null>(null);
   const [hintPhase, setHintPhase] = useState<'from' | 'to' | null>(null);
-  const [timeUntilRotation, setTimeUntilRotation] = useState<string>('');
   const [wrongMove, setWrongMove] = useState(false);
   const [puzzleObjective, setPuzzleObjective] = useState('');
   const [isCompleting, setIsCompleting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [processingVictory, setProcessingVictory] = useState(false);
+  const [victoryShownThisSession, setVictoryShownThisSession] = useState(false);
   
   const startTimeRef = useRef(Date.now());
   const timerIntervalRef = useRef<number>();
@@ -81,18 +81,22 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       setGame(gameCopy);
       setCurrentMoveIndex(completion.moves.length);
       
-      // Show victory screen
-      setTimeout(() => {
-        if (!user) {
-          const guestStats = updateGuestStats(puzzle.id, completion.timeTaken, completion.hintsUsed);
-          setVictoryStats({
-            rating: guestStats.rating,
-            ratingChange: guestStats.rating - 1000,
-            streak: guestStats.currentStreak
-          });
-        }
-        setShowVictory(true);
-      }, 500);
+      // Only show victory if not already shown in this session
+      if (!victoryShownThisSession && !sessionStorage.getItem(`victory_shown_${puzzle.id}`)) {
+        setTimeout(() => {
+          if (!user) {
+            const guestStats = updateGuestStats(puzzle.id, completion.timeTaken, completion.hintsUsed);
+            setVictoryStats({
+              rating: guestStats.rating,
+              ratingChange: guestStats.rating - 1000,
+              streak: guestStats.currentStreak
+            });
+          }
+          setShowVictory(true);
+          setVictoryShownThisSession(true);
+          sessionStorage.setItem(`victory_shown_${puzzle.id}`, '1');
+        }, 500);
+      }
       return;
     }
 
@@ -124,24 +128,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       }
     };
   }, [puzzle.id, puzzle.fen, user]);
-
-  useEffect(() => {
-    if (puzzle.nextRotation) {
-      const updateTimeUntilRotation = () => {
-        const now = new Date();
-        const rotationTime = puzzle.nextRotation ? new Date(puzzle.nextRotation) : now;
-        const diffMs = rotationTime.getTime() - now.getTime();
-        const diffHours = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60)));
-        const diffMinutes = Math.max(0, Math.floor((diffMs / (1000 * 60)) % 60));
-        setTimeUntilRotation(`${diffHours}h ${diffMinutes}m`);
-      };
-
-      updateTimeUntilRotation();
-      const interval = setInterval(updateTimeUntilRotation, 60000);
-
-      return () => clearInterval(interval);
-    }
-  }, [puzzle.nextRotation]);
 
   const formatTime = useCallback((seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -459,29 +445,13 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="card p-3 sm:p-4 bg-amber-50 border-amber-100">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-amber-700">Next puzzle in</span>
-            </div>
-            <span className="font-medium text-amber-800">{timeUntilRotation}</span>
-          </div>
-        </div>
-
-        <div className="card p-3 sm:p-4 bg-blue-50 border-blue-100">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-blue-700">Time elapsed</span>
-            </div>
-            <span className="font-medium text-blue-800">{formatTime(elapsedTime)}</span>
-          </div>
-        </div>
-      </div>
-
       <div className="card p-4 sm:p-6">
-        <h2 className="text-xl font-semibold text-center mb-4">
+        <h2 className="text-xl font-semibold text-center mb-4 flex items-center justify-center gap-3">
           {puzzleObjective}
+          <span className="flex items-center gap-1 text-blue-700 bg-blue-50 px-3 py-1 rounded-full text-sm font-medium">
+            <span role="img" aria-label="timer">⏱️</span>
+            {formatTime(elapsedTime)}
+          </span>
         </h2>
 
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">

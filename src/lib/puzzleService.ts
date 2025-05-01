@@ -62,9 +62,7 @@ export async function updatePuzzleProgress(
       p_user_id: userId,
       p_puzzle_id: puzzleId,
       p_time_taken: timeTaken,
-      p_hints_used: hintsUsed,
-      p_completed: true,
-      p_solution_viewed: false
+      p_hints_used: hintsUsed
     });
 
     if (error) {
