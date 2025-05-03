@@ -8,6 +8,21 @@ import { savePuzzleCompletion, getPuzzleCompletion } from '../lib/completionStor
 import type { ChessPuzzleProps } from '../types';
 import type { UserStats } from '../lib/puzzleService';
 
+export const ATTEMPT_CLASS = {
+  WRONG: 'wrong', // 🔲
+  RIGHT_PIECE: 'right_piece', // 🟨
+  CORRECT: 'correct', // 🟩
+} as const;
+
+export type AttemptClassification = typeof ATTEMPT_CLASS[keyof typeof ATTEMPT_CLASS];
+
+interface AttemptRecord {
+  moveIndex: number; // which move in the solution
+  timestamp: number;
+  classification: AttemptClassification;
+  hintUsed?: boolean;
+}
+
 export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   console.log('ChessPuzzle received props:', { puzzle }); // Debug log
 
@@ -52,6 +67,30 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   const progressPercentage = isCompleting ? 100 : 
     currentMoveIndex >= moveSequence.length ? 100 : 
     Math.floor((currentMoveIndex / 2) / movesToMate * 100);
+
+  const [attemptHistory, setAttemptHistory] = useState<AttemptRecord[][]>(() => {
+    // Try to load from localStorage for this puzzle
+    const key = `attemptHistory_${puzzle.id}`;
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch {}
+    }
+    // Initialize as empty arrays for each move
+    return Array.from({ length: Math.ceil((puzzle.moves || []).length) }, () => []);
+  });
+
+  // Persist attemptHistory to localStorage
+  useEffect(() => {
+    const key = `attemptHistory_${puzzle.id}`;
+    localStorage.setItem(key, JSON.stringify(attemptHistory));
+  }, [attemptHistory, puzzle.id]);
+
+  // Clear attemptHistory when starting a new puzzle
+  useEffect(() => {
+    setAttemptHistory(Array.from({ length: Math.ceil((puzzle.moves || []).length) }, () => []));
+  }, [puzzle.id]);
 
   useEffect(() => {
     const initialTurn = puzzle.fen.split(' ')[1] === 'w' ? 'White' : 'Black';
@@ -144,6 +183,16 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     setHintsUsed(prev => prev + 1);
     setWrongMove(false);
 
+    // Record a hintUsed attempt for the current user move
+    setAttemptHistory(prev => {
+      return prev.map((arr, idx) => idx === currentMoveIndex ? [...arr, {
+        moveIndex: currentMoveIndex,
+        timestamp: Date.now(),
+        classification: ATTEMPT_CLASS.RIGHT_PIECE, // or another classification if needed
+        hintUsed: true
+      }] : arr);
+    });
+
     if (!hintPhase) {
       setHintPhase('from');
       setActiveHint({ from: nextMove.from, to: '' });
@@ -208,6 +257,30 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
            (piece.color === 'b' && targetRank === '1');
   };
 
+  // Helper to classify an attempt
+  const classifyAttempt = (from: Square, to: Square, promotion?: string): AttemptClassification => {
+    const expectedMove = moveSequence[currentMoveIndex];
+    if (!expectedMove) return ATTEMPT_CLASS.WRONG;
+    if (expectedMove.from === from && expectedMove.to === to) {
+      // If promotion is required, check it
+      if (expectedMove.promotion) {
+        if (promotion && expectedMove.promotion === promotion) {
+          return ATTEMPT_CLASS.CORRECT;
+        } else {
+          return ATTEMPT_CLASS.RIGHT_PIECE; // Right squares, wrong promotion
+        }
+      }
+      return ATTEMPT_CLASS.CORRECT;
+    }
+    // Check if the piece type matches but wrong destination
+    const expectedPiece = game.get(expectedMove.from)?.type;
+    const actualPiece = game.get(from)?.type;
+    if (expectedPiece && actualPiece && expectedPiece === actualPiece) {
+      return ATTEMPT_CLASS.RIGHT_PIECE;
+    }
+    return ATTEMPT_CLASS.WRONG;
+  };
+
   const handleMove = (fromSquare: Square, toSquare: Square): boolean => {
     if (isCompleted) return false;
     
@@ -221,6 +294,18 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
 
     setActiveHint(null);
     setHintPhase(null);
+
+    // --- Attempt tracking ---
+    const classification = classifyAttempt(fromSquare, toSquare);
+    setAttemptHistory(prev => {
+      const updated = prev.map((arr, idx) => idx === currentMoveIndex ? [...arr, {
+        moveIndex: currentMoveIndex,
+        timestamp: Date.now(),
+        classification
+      }] : arr);
+      return updated;
+    });
+    // --- End attempt tracking ---
     
     if (expectedMove.from === fromSquare && expectedMove.to === toSquare) {
       setWrongMove(false);
@@ -276,11 +361,17 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
 
     // Verify the source and target squares match the expected move
     if (expectedMove.from !== fromSquare || expectedMove.to !== toSquare) {
-      console.log('Square mismatch:', {
-        expected: { from: expectedMove.from, to: expectedMove.to },
-        received: { from: fromSquare, to: toSquare }
-      });
       setWrongMove(true);
+      // --- Attempt tracking ---
+      setAttemptHistory(prev => {
+        const updated = prev.map((arr, idx) => idx === currentMoveIndex ? [...arr, {
+          moveIndex: currentMoveIndex,
+          timestamp: Date.now(),
+          classification: ATTEMPT_CLASS.WRONG
+        }] : arr);
+        return updated;
+      });
+      // --- End attempt tracking ---
       return false;
     }
 
@@ -291,20 +382,33 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     };
 
     const promotionType = promotionMap[piece];
-    console.log('Promotion type:', { piece, promotionType, expected: expectedMove.promotion });
-
     if (!promotionType) {
-      console.error('Invalid promotion piece:', piece);
       setWrongMove(true);
+      setAttemptHistory(prev => {
+        const updated = prev.map((arr, idx) => idx === currentMoveIndex ? [...arr, {
+          moveIndex: currentMoveIndex,
+          timestamp: Date.now(),
+          classification: ATTEMPT_CLASS.WRONG
+        }] : arr);
+        return updated;
+      });
       return false;
     }
 
+    // --- Attempt tracking ---
+    const classification = classifyAttempt(fromSquare, toSquare, promotionType);
+    setAttemptHistory(prev => {
+      const updated = prev.map((arr, idx) => idx === currentMoveIndex ? [...arr, {
+        moveIndex: currentMoveIndex,
+        timestamp: Date.now(),
+        classification
+      }] : arr);
+      return updated;
+    });
+    // --- End attempt tracking ---
+
     // Verify the promotion type matches the expected move
     if (expectedMove.promotion && expectedMove.promotion !== promotionType) {
-      console.log('Wrong promotion piece:', {
-        expected: expectedMove.promotion,
-        received: promotionType
-      });
       setWrongMove(true);
       return false;
     }
@@ -318,10 +422,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         promotion: promotionType
       });
 
-      console.log('Move result:', move);
-
       if (!move) {
-        console.error('Invalid promotion move');
         setWrongMove(true);
         return false;
       }
@@ -352,7 +453,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       }
       return true;
     } catch (error) {
-      console.error('Error making promotion move:', error);
       setWrongMove(true);
       return false;
     }
@@ -437,81 +537,172 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     return styles;
   };
 
-  return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Puzzle #{puzzle.metadata?.absolute_number || 1}
-        </h1>
+  // Share grid generation
+  const generateShareGrid = useCallback(() => {
+    const emojiMap = {
+      [ATTEMPT_CLASS.WRONG]: '🟥',
+      [ATTEMPT_CLASS.RIGHT_PIECE]: '🟨',
+      [ATTEMPT_CLASS.CORRECT]: '🟩',
+      hint: '🏳️',
+    };
+    // Only show columns for user's moves (every other move in moveSequence)
+    const userMoveIndexes = Array.from({ length: Math.ceil((puzzle.moves || []).length / 2) }, (_, i) => i * 2);
+    const cappedHistory = userMoveIndexes.map(idx => attemptHistory[idx]?.slice(-5) || []);
+    const maxRows = Math.max(...cappedHistory.map(col => col.length), 1);
+    // Build grid rows (top to bottom, no extra spaces)
+    const gridRows: string[] = [];
+    for (let row = 0; row < maxRows; row++) {
+      let rowStr = '';
+      for (let col = 0; col < cappedHistory.length; col++) {
+        const attempt = cappedHistory[col][row];
+        if (attempt) {
+          // If this attempt was a hint, show 🏳️
+          if (attempt.hintUsed) {
+            rowStr += emojiMap.hint;
+          } else {
+            rowStr += emojiMap[attempt.classification];
+          }
+        } else {
+          rowStr += ' ';
+        }
+      }
+      gridRows.push(rowStr);
+    }
+    // Metadata
+    const puzzleNum = puzzle.metadata?.absolute_number || puzzle.puzzle_number || puzzle.id;
+    const mateType = `Mate in ${Math.ceil((puzzle.moves || []).length / 2)}`;
+    const streak = victoryStats?.streak || 0;
+    const timeStr = `⏱️ ${formatTime(elapsedTime)}`;
+    const streakStr = `🔥 Streak: ${streak}`;
+    const url = 'chessdaily.com';
+    return [
+      `Chess-Daily #${puzzleNum}`,
+      '',
+      ...gridRows,
+      '',
+      `${timeStr} | ${mateType} | ${streakStr}`,
+      url
+    ].join('\n');
+  }, [attemptHistory, puzzle, elapsedTime, victoryStats]);
+
+  // Progress grid for UI (same as share grid, but live)
+  const renderProgressGrid = () => {
+    const emojiMap = {
+      [ATTEMPT_CLASS.WRONG]: '🟥',
+      [ATTEMPT_CLASS.RIGHT_PIECE]: '🟨',
+      [ATTEMPT_CLASS.CORRECT]: '🟩',
+      hint: '🏳️',
+    };
+    const bgMap = {
+      [ATTEMPT_CLASS.WRONG]: 'bg-red-200',
+      [ATTEMPT_CLASS.RIGHT_PIECE]: 'bg-yellow-100',
+      [ATTEMPT_CLASS.CORRECT]: 'bg-green-100',
+      hint: 'bg-gray-300',
+    };
+    // Only show columns for user's moves (every other move in moveSequence)
+    const userMoveIndexes = Array.from({ length: Math.ceil((puzzle.moves || []).length / 2) }, (_, i) => i * 2);
+    const cappedHistory = userMoveIndexes.map(idx => attemptHistory[idx]?.slice(-5) || []);
+    const numUserMoves = userMoveIndexes.length;
+    const maxRows = Math.max(...cappedHistory.map(col => col.length), 1);
+    return (
+      <div className="flex flex-col items-center w-full">
+        <div className="flex flex-row gap-2">
+          {Array.from({ length: numUserMoves }).map((_, colIdx) => (
+            <div key={colIdx} className="flex flex-col gap-1">
+              {Array.from({ length: maxRows }).map((_, rowIdx) => {
+                const attempt = cappedHistory[colIdx]?.[rowIdx];
+                let emoji = '';
+                let bg = 'bg-gray-200';
+                if (attempt) {
+                  if (attempt.hintUsed) {
+                    emoji = emojiMap.hint;
+                    bg = bgMap.hint;
+                  } else {
+                    emoji = emojiMap[attempt.classification];
+                    bg = bgMap[attempt.classification];
+                  }
+                }
+                return (
+                  <span
+                    key={rowIdx}
+                    className={`text-2xl w-10 h-10 flex items-center justify-center rounded-lg border ${bg} ${attempt ? '' : 'border-gray-300'} transition-all duration-150`}
+                    aria-label={attempt ? attempt.classification : 'empty'}
+                  >
+                    {emoji}
+                  </span>
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
+    );
+  };
 
-      <div className="card p-4 sm:p-6">
-        <h2 className="text-xl font-semibold text-center mb-4 flex items-center justify-center gap-3">
-          {puzzleObjective}
-          <span className="flex items-center gap-1 text-blue-700 bg-blue-50 px-3 py-1 rounded-full text-sm font-medium">
-            <span role="img" aria-label="timer">⏱️</span>
-            {formatTime(elapsedTime)}
-          </span>
-        </h2>
-
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-          <div className="w-full sm:w-auto mx-auto flex justify-center">
-            <div className="chess-board-container">
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Main grid layout: board + sidebar */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-0 max-w-7xl mx-auto w-full items-start">
+        {/* Board area (centered, 8/12 cols on desktop) */}
+        <div className="col-span-1 lg:col-span-8 flex flex-col items-center justify-start pt-0 pb-2 px-2 sm:px-4">
+          <div className="w-full flex flex-col items-center mb-1">
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">Puzzle #{puzzle.metadata?.absolute_number || 1}</h1>
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-700 bg-white/90 px-4 py-2 rounded-lg shadow-sm inline-block mb-1">
+              {puzzleObjective}
+              <span className="ml-3 inline-flex items-center gap-1 text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full text-xs font-medium align-middle">
+                <span role="img" aria-label="timer">⏱️</span>
+                {formatTime(elapsedTime)}
+              </span>
+            </h2>
+          </div>
+          <div className="flex flex-col items-center justify-center w-full">
+            {/* Chessboard container fix: larger max width, min width, and always centered */}
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-2 sm:p-4 transition-shadow duration-300 w-full max-w-3xl min-w-[320px] min-h-[320px] flex items-center justify-center mx-auto">
               <Chessboard
                 position={game.fen()}
                 onPieceDrop={handleMove}
                 onPromotionPieceSelect={handlePromotion}
                 boardOrientation={playerColor}
                 customBoardStyle={{
-                  borderRadius: '8px',
+                  borderRadius: '12px',
                 }}
                 customSquareStyles={getSquareStyles()}
               />
             </div>
-          </div>
-
-          <div className="progress-bar-container hidden sm:flex h-[600px] w-6">
-            <div 
-              className="progress-bar-fill"
-              style={{ 
-                height: `${progressPercentage}%`,
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Mobile progress bar */}
-        <div className="progress-bar-container mobile-progress-bar sm:hidden">
-          <div 
-            className="progress-bar-fill"
-            style={{ 
-              width: `${progressPercentage}%`,
-              height: '100%'
-            }}
-          />
-        </div>
-
-        {wrongMove && (
-          <div className="mt-4 text-center">
-            <div className="inline-block bg-red-50 border border-red-100 rounded-lg px-4 py-2 animate-[fade-in_0.2s_ease-out]">
-              <p className="text-red-600 font-bold text-[1.2em]">
-                Oops! Wrong move. Try again!
-              </p>
+            <div className="mt-3 flex flex-col items-center w-full">
+              <button
+                onClick={showHint}
+                className="btn-secondary flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm bg-blue-50 text-blue-700 hover:bg-blue-100 transition-all duration-150"
+                disabled={isCompleted}
+              >
+                Hint {hintsUsed > 0 && `(${hintsUsed})`}
+              </button>
             </div>
-          </div>
-        )}
-        
-        <div className="mt-4">
-          <div className="flex items-center justify-center">
-            <button
-              onClick={showHint}
-              className="btn-secondary flex items-center gap-2"
-              disabled={isCompleted}
-            >
-              Hint {hintsUsed > 0 && `(${hintsUsed})`}
-            </button>
+            {wrongMove && (
+              <div className="mt-3 text-center">
+                <div className="inline-block bg-red-50 border border-red-100 rounded-lg px-4 py-2 animate-[fade-in_0.2s_ease-out]">
+                  <p className="text-red-600 font-bold text-[1.2em]">
+                    Oops! Wrong move. Try again!
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+        {/* Sidebar: progress + extras (4/12 cols on desktop) */}
+        <aside className="col-span-1 lg:col-span-4 flex flex-col items-start justify-start py-8 px-2 sm:px-6 bg-white/95 rounded-l-3xl shadow-xl border-l border-gray-200 transition-all duration-300 min-h-full">
+          <div className="w-full max-w-xs">
+            <div className="mb-6">
+              <div className="font-bold text-lg text-gray-800 mb-2">Your Progress</div>
+              {/* Balanced padding and reduced height for progress grid */}
+              <div className="bg-gray-100 rounded-xl shadow-inner px-4 py-4 h-[220px] flex items-start justify-center">
+                {renderProgressGrid()}
+              </div>
+            </div>
+            {/* Placeholder for achievements or other sidebar content */}
+            {/* <div className="mt-8"> ... </div> */}
+          </div>
+        </aside>
       </div>
 
       {showVictory && victoryStats && (
@@ -521,6 +712,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           rating={victoryStats.rating}
           ratingChange={victoryStats.ratingChange}
           streak={victoryStats.streak}
+          shareGridData={generateShareGrid()}
         />
       )}
     </div>

@@ -10,6 +10,7 @@ interface VictoryCelebrationProps {
   streak?: number;
   rating: number;
   ratingChange: number;
+  shareGridData?: string;
 }
 
 export function VictoryCelebration({ 
@@ -17,7 +18,8 @@ export function VictoryCelebration({
   elapsedTime, 
   streak = 0,
   rating,
-  ratingChange
+  ratingChange,
+  shareGridData
 }: VictoryCelebrationProps) {
   const [isActive, setIsActive] = useState(true);
   const [showSummary, setShowSummary] = useState(false);
@@ -26,6 +28,7 @@ export function VictoryCelebration({
     interrupt: true 
   });
   const { user, setShowAuthModal } = useAuthStore();
+  const [copied, setCopied] = useState(false);
 
   // Play sound and show confetti immediately
   useEffect(() => {
@@ -54,6 +57,17 @@ export function VictoryCelebration({
   const handleClose = () => {
     setIsActive(false);
     onComplete?.();
+  };
+
+  const handleShare = async () => {
+    if (!shareGridData) return;
+    try {
+      await navigator.clipboard.writeText(shareGridData);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
   };
 
   if (!isActive) return null;
@@ -110,6 +124,21 @@ export function VictoryCelebration({
                     <p className="text-2xl font-bold text-gray-900">{rating}</p>
                   </div>
                 </div>
+
+                {shareGridData && (
+                  <div className="text-center space-y-2">
+                    <button
+                      onClick={handleShare}
+                      className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition-all duration-150 flex items-center justify-center gap-2"
+                      aria-label="Share your solve grid"
+                    >
+                      📋 Share Results
+                    </button>
+                    {copied && (
+                      <div className="text-green-600 text-sm mt-1">Copied to clipboard!</div>
+                    )}
+                  </div>
+                )}
 
                 {!user && (
                   <div className="mt-6 -mb-2">

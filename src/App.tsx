@@ -28,6 +28,7 @@ function App() {
   const { user, setUser } = useAuthStore();
   const lastPollTimeRef = useRef(Date.now());
   const currentPuzzleIdRef = useRef<string | null>(null);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   const fetchPuzzle = useCallback(async (force = false) => {
     try {
@@ -215,9 +216,16 @@ function App() {
                 </div>
               </div>
               
-              <div>
+              <div className="flex items-center gap-3">
+                <button
+                  className="text-sm font-medium text-blue-700 hover:underline focus:outline-none"
+                  onClick={() => setShowHowToPlay(true)}
+                  aria-label="How to Play"
+                >
+                  How to Play
+                </button>
                 {user ? (
-                  <div className="flex items-center gap-3">
+                  <>
                     <span className="text-sm text-gray-600 hidden sm:inline">{user.email}</span>
                     <button
                       onClick={() => useAuthStore.getState().signOut()}
@@ -225,7 +233,7 @@ function App() {
                     >
                       Sign Out
                     </button>
-                  </div>
+                  </>
                 ) : (
                   <button
                     onClick={() => setShowAuthModal(true)}
@@ -263,6 +271,45 @@ function App() {
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
         />
+
+        {showHowToPlay && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 relative animate-fade-in">
+              <button
+                className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none"
+                onClick={() => setShowHowToPlay(false)}
+                aria-label="Close How to Play"
+              >
+                ×
+              </button>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">How to Play</h2>
+              <ol className="list-decimal list-inside text-gray-800 space-y-2 mb-4">
+                <li>Play the right moves to checkmate the opponent's king.</li>
+                <li>
+                  <span className="font-semibold">Emoji meanings:</span>
+                  <ul className="ml-4 mt-1 space-y-1">
+                    <li><span className="text-2xl align-middle">🟩</span> Correct move</li>
+                    <li><span className="text-2xl align-middle">🟨</span> Right piece, wrong square</li>
+                    <li><span className="text-2xl align-middle">🟥</span> Wrong move or piece</li>
+                    <li><span className="text-2xl align-middle">🏳️</span> Used a hint</li>
+                  </ul>
+                </li>
+                <li>
+                  <span className="font-semibold">Rating:</span> Your rating increases more if you solve quickly and use fewer hints. Faster solves and fewer hints = higher rating!
+                </li>
+                <li>New puzzles every day. Come back daily to keep your streak going!</li>
+              </ol>
+              <div className="flex justify-end">
+                <button
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-600 transition-all text-sm"
+                  onClick={() => setShowHowToPlay(false)}
+                >
+                  Got it!
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </ErrorBoundary>
   );
