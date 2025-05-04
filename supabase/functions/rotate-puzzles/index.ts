@@ -18,45 +18,39 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Get current 8-hour interval (0, 1, or 2)
-    const currentHour = new Date().getUTCHours();
-    const interval = Math.floor(currentHour / 8);
+    // --- 1. Calculate the current puzzle day (starts at 16:30 UTC = 10 PM IST) ---
+    const now = new Date();
+    // Shift time to 10 PM IST (16:30 UTC) as the start of the puzzle day
+    const puzzleDay = new Date(now.getTime() - (16.5 * 60 * 60 * 1000)); // 16.5 hours in ms
+    const yearStart = new Date(Date.UTC(puzzleDay.getUTCFullYear(), 0, 0));
+    const dayOfYear = Math.floor((puzzleDay.getTime() - yearStart.getTime()) / 86400000);
 
-    // Get total number of puzzles
-    const { count } = await supabase
+    // --- 2. Get all puzzles ordered by puzzle_number ---
+    const { data: puzzles, error: puzzlesError } = await supabase
       .from('puzzles')
-      .select('*', { count: 'exact', head: true });
+      .select('id')
+      .order('puzzle_number', { ascending: true });
 
-    if (!count) {
-      throw new Error('No puzzles found');
-    }
+    if (puzzlesError || !puzzles || puzzles.length === 0) throw puzzlesError || new Error('No puzzles found');
+    const puzzleIndex = dayOfYear % puzzles.length;
+    const puzzleId = puzzles[puzzleIndex].id;
 
-    // Calculate puzzle number for this interval
-    const puzzleNumber = (interval % count) + 1;
-
-    // Get the puzzle for this interval
     const { data: puzzle, error: puzzleError } = await supabase
       .from('puzzles')
       .select('*')
-      .eq('puzzle_number', puzzleNumber)
+      .eq('id', puzzleId)
       .single();
-
     if (puzzleError) throw puzzleError;
 
-    // Record this interval
-    const { error: intervalError } = await supabase
-      .from('puzzle_intervals')
-      .insert({
-        puzzle_id: puzzle.id,
-        interval_number: interval,
-        start_time: new Date(new Date().setUTCHours(interval * 8, 0, 0, 0)).toISOString(),
-        end_time: new Date(new Date().setUTCHours((interval + 1) * 8, 0, 0, 0)).toISOString()
-      });
-
-    if (intervalError) throw intervalError;
+    // --- 3. Calculate next rotation time (next 16:30 UTC) ---
+    const nextRotation = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 16, 30, 0, 0));
+    if (now >= nextRotation) {
+      // If we've already passed today's 16:30 UTC, set to tomorrow
+      nextRotation.setUTCDate(nextRotation.getUTCDate() + 1);
+    }
 
     return new Response(
-      JSON.stringify({ puzzle, nextRotation: (interval + 1) * 8 }),
+      JSON.stringify({ puzzle, nextRotation: nextRotation.toISOString() }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
