@@ -563,7 +563,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
             rowStr += emojiMap[attempt.classification];
           }
         } else {
-          rowStr += ' ';
+          rowStr += '\u00A0'; // Use non-breaking space for alignment
         }
       }
       gridRows.push(rowStr);
