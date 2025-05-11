@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Confetti from 'react-confetti';
 import useSound from 'use-sound';
-import { Trophy, Star, TrendingUp, LogIn } from 'lucide-react';
+import { Trophy, Star, TrendingUp, LogIn, Twitter, Instagram, Download, Clipboard } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import html2canvas from 'html2canvas';
 
 interface VictoryCelebrationProps {
   onComplete?: () => void;
@@ -90,7 +91,7 @@ export function VictoryCelebration({
           </h2>
           
           {showSummary && (
-            <div className="pointer-events-auto bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl border-2 border-yellow-500/30 max-w-sm w-full mx-4 transform scale-up">
+            <div className="pointer-events-auto bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl border-2 border-yellow-500/30 max-w-md sm:max-w-lg w-full mx-4 transform scale-up">
               <div className="space-y-4">
                 <div className="text-center space-y-1">
                   <p className="text-gray-600 text-sm">Time to Solve</p>
@@ -127,13 +128,95 @@ export function VictoryCelebration({
 
                 {shareGridData && (
                   <div className="text-center space-y-2">
-                    <button
-                      onClick={handleShare}
-                      className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition-all duration-150 flex items-center justify-center gap-2"
-                      aria-label="Share your solve grid"
-                    >
-                      📋 Share Results
-                    </button>
+                    <div className="flex flex-wrap gap-2 justify-center items-center w-full">
+                      {/* Copy Text */}
+                      <button
+                        onClick={handleShare}
+                        className="bg-blue-600 text-white font-semibold py-2 px-3 rounded-lg shadow hover:bg-blue-700 transition-all flex items-center gap-1 min-w-[110px] sm:min-w-[120px]"
+                        aria-label="Copy share text"
+                      >
+                        <Clipboard className="w-5 h-5" /> Copy
+                      </button>
+                      {/* Download Image */}
+                      <button
+                        onClick={async () => {
+                          const el = document.createElement('pre');
+                          el.textContent = shareGridData;
+                          el.style.fontFamily = 'monospace';
+                          el.style.fontSize = '20px';
+                          el.style.background = '#fff';
+                          el.style.color = '#222';
+                          el.style.padding = '16px';
+                          el.style.borderRadius = '12px';
+                          el.style.display = 'inline-block';
+                          document.body.appendChild(el);
+                          const canvas = await html2canvas(el, { backgroundColor: '#fff' });
+                          document.body.removeChild(el);
+                          const link = document.createElement('a');
+                          link.download = 'chess-daily-share.png';
+                          link.href = canvas.toDataURL();
+                          link.click();
+                        }}
+                        className="bg-green-600 text-white font-semibold py-2 px-3 rounded-lg shadow hover:bg-green-700 transition-all flex items-center gap-1 min-w-[110px] sm:min-w-[120px]"
+                        aria-label="Download share image"
+                      >
+                        <Download className="w-5 h-5" /> Download
+                      </button>
+                      {/* Twitter Share */}
+                      <button
+                        onClick={() => {
+                          const tweet = encodeURIComponent(shareGridData);
+                          window.open(`https://twitter.com/intent/tweet?text=${tweet}`, '_blank');
+                        }}
+                        className="bg-blue-400 text-white font-semibold py-2 px-3 rounded-lg shadow hover:bg-blue-500 transition-all flex items-center gap-1 min-w-[110px] sm:min-w-[120px]"
+                        aria-label="Share on Twitter"
+                      >
+                        <Twitter className="w-5 h-5" /> Twitter
+                      </button>
+                      {/* Instagram Share */}
+                      <button
+                        onClick={async () => {
+                          // Try to share image via Instagram Stories (mobile), else download
+                          const el = document.createElement('pre');
+                          el.textContent = shareGridData;
+                          el.style.fontFamily = 'monospace';
+                          el.style.fontSize = '20px';
+                          el.style.background = '#fff';
+                          el.style.color = '#222';
+                          el.style.padding = '16px';
+                          el.style.borderRadius = '12px';
+                          el.style.display = 'inline-block';
+                          document.body.appendChild(el);
+                          const canvas = await html2canvas(el, { backgroundColor: '#fff' });
+                          document.body.removeChild(el);
+                          const dataUrl = canvas.toDataURL('image/png');
+                          if (navigator.userAgent.match(/(iPhone|iPad|Android)/i)) {
+                            // Try to use Instagram Stories intent (best effort)
+                            const blob = await (await fetch(dataUrl)).blob();
+                            const filesArray = [new File([blob], 'chess-daily-share.png', { type: 'image/png' })];
+                            if (navigator.canShare && navigator.canShare({ files: filesArray })) {
+                              navigator.share({ files: filesArray, title: 'Chess Daily', text: 'Check out my puzzle!' });
+                            } else {
+                              // Fallback: download
+                              const link = document.createElement('a');
+                              link.download = 'chess-daily-share.png';
+                              link.href = dataUrl;
+                              link.click();
+                            }
+                          } else {
+                            // Desktop: download
+                            const link = document.createElement('a');
+                            link.download = 'chess-daily-share.png';
+                            link.href = dataUrl;
+                            link.click();
+                          }
+                        }}
+                        className="bg-pink-500 text-white font-semibold py-2 px-3 rounded-lg shadow hover:bg-pink-600 transition-all flex items-center gap-1 min-w-[110px] sm:min-w-[120px]"
+                        aria-label="Share on Instagram"
+                      >
+                        <Instagram className="w-5 h-5" /> Instagram
+                      </button>
+                    </div>
                     {copied && (
                       <div className="text-green-600 text-sm mt-1">Copied to clipboard!</div>
                     )}
