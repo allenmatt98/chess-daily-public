@@ -548,15 +548,15 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     // Only show columns for user's moves (every other move in moveSequence)
     const userMoveIndexes = Array.from({ length: Math.ceil((puzzle.moves || []).length / 2) }, (_, i) => i * 2);
     const cappedHistory = userMoveIndexes.map(idx => attemptHistory[idx]?.slice(-5) || []);
+    // Build grid rows (top to bottom, no extra spaces, always rectangular)
+    const numCols = cappedHistory.length;
     const maxRows = Math.max(...cappedHistory.map(col => col.length), 1);
-    // Build grid rows (top to bottom, no extra spaces)
     const gridRows: string[] = [];
     for (let row = 0; row < maxRows; row++) {
       let rowStr = '';
-      for (let col = 0; col < cappedHistory.length; col++) {
+      for (let col = 0; col < numCols; col++) {
         const attempt = cappedHistory[col][row];
         if (attempt) {
-          // If this attempt was a hint, show 🏳️
           if (attempt.hintUsed) {
             rowStr += emojiMap.hint;
           } else {
@@ -574,7 +574,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     const streak = victoryStats?.streak || 0;
     const timeStr = `⏱️ ${formatTime(elapsedTime)}`;
     const streakStr = `🔥 Streak: ${streak}`;
-    const url = 'chessdaily.com';
+    const url = 'www.chess-daily.com';
     return [
       `Chess-Daily #${puzzleNum}`,
       '',
