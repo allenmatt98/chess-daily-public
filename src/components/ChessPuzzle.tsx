@@ -122,19 +122,19 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       
       // Only show victory if not already shown in this session
       if (!victoryShownThisSession && !sessionStorage.getItem(`victory_shown_${puzzle.id}`)) {
-        setTimeout(() => {
-          if (!user) {
-            const guestStats = updateGuestStats(puzzle.id, completion.timeTaken, completion.hintsUsed);
-            setVictoryStats({
-              rating: guestStats.rating,
-              ratingChange: guestStats.rating - 1000,
-              streak: guestStats.currentStreak
-            });
-          }
-          setShowVictory(true);
+      setTimeout(() => {
+        if (!user) {
+          const guestStats = updateGuestStats(puzzle.id, completion.timeTaken, completion.hintsUsed);
+          setVictoryStats({
+            rating: guestStats.rating,
+            ratingChange: guestStats.rating - 1000,
+            streak: guestStats.currentStreak
+          });
+        }
+        setShowVictory(true);
           setVictoryShownThisSession(true);
           sessionStorage.setItem(`victory_shown_${puzzle.id}`, '1');
-        }, 500);
+      }, 500);
       }
       return;
     }
@@ -622,7 +622,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
                     bg = bgMap[attempt.classification];
                   }
                 }
-                return (
+  return (
                   <span
                     key={rowIdx}
                     className={`text-2xl w-10 h-10 flex items-center justify-center rounded-lg border ${bg} ${attempt ? '' : 'border-gray-300'} transition-all duration-150`}
@@ -648,12 +648,12 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           <div className="w-full flex flex-col items-center mb-1">
             <h1 className="text-2xl font-bold text-gray-900 mb-1">Puzzle #{puzzle.metadata?.absolute_number || 1}</h1>
             <h2 className="text-lg sm:text-xl font-semibold text-gray-700 bg-white/90 px-4 py-2 rounded-lg shadow-sm inline-block mb-1">
-              {puzzleObjective}
+          {puzzleObjective}
               <span className="ml-3 inline-flex items-center gap-1 text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full text-xs font-medium align-middle">
                 <span role="img" aria-label="timer">⏱️</span>
                 {formatTime(elapsedTime)}
               </span>
-            </h2>
+        </h2>
           </div>
           <div className="flex flex-col items-center justify-center w-full">
             {/* Chessboard container fix: larger max width, min width, and always centered */}
@@ -677,16 +677,16 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
               >
                 Hint {hintsUsed > 0 && `(${hintsUsed})`}
               </button>
-            </div>
-            {wrongMove && (
+        </div>
+        {wrongMove && (
               <div className="mt-3 text-center">
-                <div className="inline-block bg-red-50 border border-red-100 rounded-lg px-4 py-2 animate-[fade-in_0.2s_ease-out]">
-                  <p className="text-red-600 font-bold text-[1.2em]">
-                    Oops! Wrong move. Try again!
-                  </p>
-                </div>
-              </div>
-            )}
+            <div className="inline-block bg-red-50 border border-red-100 rounded-lg px-4 py-2 animate-[fade-in_0.2s_ease-out]">
+              <p className="text-red-600 font-bold text-[1.2em]">
+                Oops! Wrong move. Try again!
+              </p>
+            </div>
+          </div>
+        )}
           </div>
         </div>
         {/* Sidebar: progress + extras (4/12 cols on desktop) */}

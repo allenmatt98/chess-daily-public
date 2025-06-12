@@ -17,6 +17,11 @@ export interface UserStats {
   canUpdateRating?: boolean;
 }
 
+export interface PuzzleWithProgress extends Puzzle {
+  solved: boolean;
+  bestTime?: number;
+}
+
 export async function getUserStats(userId: string): Promise<UserStats> {
   try {
     const { data, error } = await supabase
@@ -77,6 +82,40 @@ export async function updatePuzzleProgress(
   }
 }
 
+export async function updateHistoricalPuzzleProgress(
+  userId: string,
+  puzzleId: string,
+  timeTaken: number,
+  hintsUsed: number
+): Promise<UserStats | null> {
+  console.log('Updating historical puzzle progress:', {
+    userId,
+    puzzleId,
+    timeTaken,
+    hintsUsed,
+    timestamp: new Date().toISOString()
+  });
+
+  try {
+    const { data, error } = await supabase.rpc('update_historical_puzzle_progress', {
+      p_user_id: userId,
+      p_puzzle_id: puzzleId,
+      p_time_taken: timeTaken,
+      p_hints_used: hintsUsed
+    });
+
+    if (error) {
+      console.error('Error updating historical puzzle progress:', error);
+      return null;
+    }
+
+    return data as UserStats;
+  } catch (error) {
+    console.error('Error in updateHistoricalPuzzleProgress:', error);
+    return null;
+  }
+}
+
 export async function getDailyPuzzle(): Promise<PuzzleResponse> {
   try {
     const { data, error } = await supabase
@@ -123,4 +162,42 @@ export async function getDailyPuzzle(): Promise<PuzzleResponse> {
     console.error('Error in getDailyPuzzle:', error);
     throw error;
   }
+}
+
+export async function getAllPuzzlesWithProgress(userId: string): Promise<PuzzleWithProgress[]> {
+  // Fetch all puzzles
+  const { data: puzzles, error: puzzlesError } = await supabase
+    .from('puzzles')
+    .select('*')
+    .order('absolute_number', { ascending: true });
+
+  if (puzzlesError || !puzzles) {
+    console.error('Error fetching puzzles:', puzzlesError);
+    return [];
+  }
+
+  // Fetch user progress for all puzzles
+  const { data: progress, error: progressError } = await supabase
+    .from('user_progress')
+    .select('puzzle_id, completed, time_taken')
+    .eq('user_id', userId);
+
+  if (progressError) {
+    console.error('Error fetching user progress:', progressError);
+    // Still return puzzles, but mark all as unsolved
+    return puzzles.map(p => ({ ...p, solved: false }));
+  }
+
+  // Map progress by puzzle_id for quick lookup
+  const progressMap = new Map(progress.map((p: any) => [p.puzzle_id, p]));
+
+  // Merge puzzles with progress
+  return puzzles.map(puzzle => {
+    const prog = progressMap.get(puzzle.id);
+    return {
+      ...puzzle,
+      solved: !!prog?.completed,
+      bestTime: prog?.time_taken ?? undefined
+    };
+  });
 }
