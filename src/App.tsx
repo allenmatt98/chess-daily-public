@@ -6,6 +6,7 @@ import { AuthPrompt } from './components/AuthPrompt';
 import { UserStats } from './components/UserStats';
 import { Footer } from './components/Footer';
 import { useAuthStore } from './store/authStore';
+import { useTheme } from './hooks/useTheme';
 import { supabase } from './lib/supabase';
 import { getDailyPuzzle, updatePuzzleProgress, getUserStats } from './lib/puzzleService';
 import { generateMoveSequence } from './utils/moveGenerator';
@@ -28,6 +29,7 @@ function App() {
   const [userStats, setUserStats] = useState({ rating: 1000, currentStreak: 0, highestStreak: 0 });
   const [nextRotation, setNextRotation] = useState<string | null>(null);
   const { user, setUser } = useAuthStore();
+  const { isDarkMode } = useTheme(); // Initialize theme
   const lastPollTimeRef = useRef(Date.now());
   const currentPuzzleIdRef = useRef<string | null>(null);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
@@ -133,15 +135,15 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-background)' }}>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-background)' }}>
         <div className="text-center space-y-4">
           <p className="text-red-600">{error}</p>
           <button 
@@ -158,8 +160,8 @@ function App() {
   if (!currentPuzzle) {
     console.log('No current puzzle available'); // Debug log
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-lg text-gray-600">No puzzle available</p>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-background)' }}>
+        <p className="text-lg" style={{ color: 'var(--color-text-muted)' }}>No puzzle available</p>
       </div>
     );
   }
@@ -200,7 +202,7 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen flex flex-col bg-[--color-background]">
+      <div className="min-h-screen flex flex-col transition-colors duration-300" style={{ backgroundColor: 'var(--color-background)' }}>
         <Header
           onHowToPlay={() => setShowHowToPlay(true)}
           onSignIn={() => setShowAuthModal(true)}
@@ -241,16 +243,19 @@ function App() {
 
         {showHowToPlay && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 relative animate-fade-in">
+            <div className="card max-w-md w-full p-6 relative animate-fade-in mx-4">
               <button
-                className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none"
+                className="absolute top-3 right-3 text-2xl font-bold focus:outline-none transition-colors duration-200"
+                style={{ color: 'var(--color-text-muted)' }}
+                onMouseEnter={(e) => e.target.style.color = 'var(--color-text)'}
+                onMouseLeave={(e) => e.target.style.color = 'var(--color-text-muted)'}
                 onClick={() => setShowHowToPlay(false)}
                 aria-label="Close How to Play"
               >
                 ×
               </button>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">How to Play</h2>
-              <ol className="list-decimal list-inside text-gray-800 space-y-2 mb-4">
+              <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>How to Play</h2>
+              <ol className="list-decimal list-inside space-y-2 mb-4" style={{ color: 'var(--color-text)' }}>
                 <li>Play the right moves to checkmate the opponent's king.</li>
                 <li>
                   <span className="font-semibold">Emoji meanings:</span>

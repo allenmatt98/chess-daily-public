@@ -3,6 +3,7 @@ import { Chessboard } from 'react-chessboard';
 import { Chess, Square } from 'chess.js';
 import { VictoryCelebration } from './VictoryCelebration';
 import { useAuthStore } from '../store/authStore';
+import { useTheme } from '../hooks/useTheme';
 import { updateGuestStats } from '../lib/guestStats';
 import { savePuzzleCompletion, getPuzzleCompletion } from '../lib/completionStorage';
 import { Lightbulb, Clock, Target, Zap } from 'lucide-react';
@@ -25,6 +26,8 @@ interface AttemptRecord {
 }
 
 export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
+  const { isDarkMode } = useTheme();
+
   if (!puzzle?.fen) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -604,7 +607,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col">
+    <div className="min-h-screen flex flex-col transition-colors duration-300" style={{ backgroundColor: 'var(--color-background)' }}>
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-7xl mx-auto w-full items-start p-4">
         {/* Main puzzle area */}
         <div className="col-span-1 lg:col-span-8 flex flex-col items-center justify-start">
@@ -613,15 +616,15 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
             <div className="card p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-100 mb-1">
+                  <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--color-text)' }}>
                     Puzzle #{puzzle.metadata?.absolute_number || 1}
                   </h1>
-                  <p className="text-lg text-slate-300">{puzzleObjective}</p>
+                  <p className="text-lg" style={{ color: 'var(--color-text-muted)' }}>{puzzleObjective}</p>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 px-3 py-2 bg-slate-700 rounded-lg">
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--color-border)' }}>
                     <Clock className="w-4 h-4 text-green-400" />
-                    <span className="text-slate-200 font-mono">{formatTime(elapsedTime)}</span>
+                    <span className="font-mono" style={{ color: 'var(--color-text)' }}>{formatTime(elapsedTime)}</span>
                   </div>
                   {hintsUsed > 0 && (
                     <div className="flex items-center gap-2 px-3 py-2 bg-yellow-500/20 rounded-lg">
@@ -633,7 +636,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
               </div>
               
               {/* Progress bar */}
-              <div className="w-full bg-slate-700 rounded-full h-2">
+              <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--color-border)' }}>
                 <div 
                   className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full transition-all duration-500 ease-out"
                   style={{ width: `${progressPercentage}%` }}
@@ -642,8 +645,8 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
             </div>
           </div>
 
-          {/* Chess board with enhanced dark theme styling */}
-          <div className="chess-board-container mb-6">
+          {/* Chess board with enhanced theme styling */}
+          <div className={`chess-board-container mb-6 ${isDarkMode ? 'dark' : ''}`}>
             <Chessboard
               position={game.fen()}
               onPieceDrop={handleMove}
@@ -653,10 +656,10 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
                 borderRadius: '12px',
               }}
               customDarkSquareStyle={{
-                backgroundColor: '#475569'
+                backgroundColor: isDarkMode ? '#475569' : '#8b5cf6'
               }}
               customLightSquareStyle={{
-                backgroundColor: '#cbd5e1'
+                backgroundColor: isDarkMode ? '#cbd5e1' : '#f3f4f6'
               }}
               customSquareStyles={getSquareStyles()}
               showBoardNotation={true}
@@ -692,10 +695,10 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           <div className="card p-6 sticky top-24">
             <div className="flex items-center gap-2 mb-4">
               <Target className="w-5 h-5 text-green-400" />
-              <h3 className="text-lg font-semibold text-slate-100">Your Progress</h3>
+              <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
             </div>
             
-            <div className="bg-slate-700/50 rounded-xl p-4 min-h-[200px] flex items-center justify-center">
+            <div className="rounded-xl p-4 min-h-[200px] flex items-center justify-center" style={{ backgroundColor: 'var(--color-border)' }}>
               {renderProgressGrid()}
             </div>
             
@@ -705,7 +708,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
                   <Zap className="w-5 h-5 text-green-400" />
                   <span className="text-green-300 font-medium">Puzzle Complete!</span>
                 </div>
-                <p className="text-slate-300 text-sm">
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                   Solved in {formatTime(finalTimeRef.current)} with {hintsUsed} hints
                 </p>
               </div>
