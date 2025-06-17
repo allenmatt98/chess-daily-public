@@ -94,6 +94,14 @@
     @apply relative mx-auto;
     border-radius: 8px;
     transition: all 0.3s ease;
+    /* CRITICAL FIX: Prevent accidental moves on mobile scroll */
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 
   .progress-grid {
