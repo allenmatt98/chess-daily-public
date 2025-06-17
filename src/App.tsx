@@ -210,7 +210,20 @@ function App() {
           onLogoClick={() => navigate('/')}
           leftActions={
             <button
-              className="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 transition"
+              className="px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 border"
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text)'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = 'var(--color-border)';
+                e.target.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'var(--color-surface)';
+                e.target.style.transform = 'translateY(0)';
+              }}
               onClick={() => navigate('/historical-puzzles')}
             >
               Puzzle Archives

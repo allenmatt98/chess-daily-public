@@ -79,21 +79,21 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
 
   // Calculate responsive board width with better mobile handling
   const getBoardWidth = () => {
-    if (typeof window === 'undefined') return 280;
+    if (typeof window === 'undefined') return 300;
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
-    const padding = 16; // Reduced padding for mobile
+    const padding = 32; // Account for container padding
     
     if (screenWidth < 480) { // Very small mobile
-      return Math.max(260, Math.min(screenWidth - padding, 300));
+      return Math.max(280, Math.min(screenWidth - padding, 320));
     } else if (screenWidth < 640) { // Mobile
-      return Math.max(280, Math.min(screenWidth - padding, 340));
+      return Math.max(300, Math.min(screenWidth - padding, 360));
     } else if (screenWidth < 768) { // Small tablet
-      return Math.min(380, screenWidth * 0.6);
+      return Math.min(400, screenWidth * 0.6);
     } else if (screenWidth < 1024) { // Tablet
-      return Math.min(420, screenWidth * 0.5);
+      return Math.min(440, screenWidth * 0.5);
     } else { // Desktop
-      return Math.min(480, screenWidth * 0.35);
+      return Math.min(500, screenWidth * 0.35);
     }
   };
 
@@ -639,90 +639,95 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
 
   return (
     <div className="min-h-screen flex flex-col transition-colors duration-300" style={{ backgroundColor: 'var(--color-background)' }}>
-      <div className="flex-1 w-full max-w-7xl mx-auto p-1 sm:p-2 lg:p-4">
+      <div className="flex-1 w-full max-w-7xl mx-auto p-3 sm:p-4 lg:p-6">
         {/* Mobile-first responsive layout */}
-        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-2 sm:gap-3 lg:gap-4">
+        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-4 sm:gap-6">
           
           {/* Main puzzle area */}
           <div className="lg:col-span-8 order-1">
             {/* Compact puzzle header */}
-            <div className="card p-2 sm:p-3 lg:p-4 mb-2 sm:mb-3">
-              <div className="flex flex-col space-y-1 sm:space-y-2">
-                {/* Title and objective - more compact */}
+            <div className="card p-3 sm:p-4 lg:p-6 mb-4 sm:mb-6">
+              <div className="flex flex-col space-y-3 sm:space-y-4">
+                {/* Title and objective */}
                 <div className="text-center">
-                  <h1 className="text-base sm:text-lg lg:text-xl font-bold mb-1" style={{ color: 'var(--color-text)' }}>
+                  <h1 className="text-lg sm:text-xl lg:text-2xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
                     Puzzle #{puzzle.metadata?.absolute_number || 1}
                   </h1>
-                  <p className="text-xs sm:text-sm" style={{ color: 'var(--color-text-muted)' }}>{puzzleObjective}</p>
+                  <p className="text-sm sm:text-base" style={{ color: 'var(--color-text-muted)' }}>{puzzleObjective}</p>
                 </div>
                 
-                {/* Compact stats row */}
-                <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
-                  <div className="flex items-center gap-1 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded border text-xs" style={{ 
+                {/* Stats row */}
+                <div className="flex items-center justify-center gap-3 sm:gap-4 flex-wrap">
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg border text-sm" style={{ 
                     backgroundColor: 'var(--color-surface)',
                     borderColor: 'var(--color-border)'
                   }}>
-                    <Clock className="w-3 h-3 text-green-400" />
+                    <Clock className="w-4 h-4 text-green-400" />
                     <span className="font-mono" style={{ color: 'var(--color-text)' }}>{formatTime(elapsedTime)}</span>
                   </div>
                   
                   {hintsUsed > 0 && (
-                    <div className="flex items-center gap-1 px-1.5 py-0.5 sm:px-2 sm:py-1 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs">
-                      <Lightbulb className="w-3 h-3 text-yellow-400" />
+                    <div className="flex items-center gap-2 px-3 py-2 bg-yellow-500/20 border border-yellow-500/30 rounded-lg text-sm">
+                      <Lightbulb className="w-4 h-4 text-yellow-400" />
                       <span className="text-yellow-300 font-medium">{hintsUsed} hints</span>
                     </div>
                   )}
                 </div>
                 
-                {/* Compact progress bar */}
-                <div className="w-full rounded-full h-1 sm:h-1.5" style={{ backgroundColor: 'var(--color-border)' }}>
+                {/* Progress bar */}
+                <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--color-border)' }}>
                   <div 
-                    className="bg-gradient-to-r from-green-500 to-green-400 h-1 sm:h-1.5 rounded-full transition-all duration-500 ease-out"
+                    className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full transition-all duration-500 ease-out"
                     style={{ width: `${progressPercentage}%` }}
                   ></div>
                 </div>
               </div>
             </div>
 
-            {/* Chess board - optimized for mobile */}
-            <div className="flex justify-center mb-2 sm:mb-3">
-              <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`} style={{ width: boardWidth, height: boardWidth }}>
-                <Chessboard
-                  position={game.fen()}
-                  onPieceDrop={handleMove}
-                  onPromotionPieceSelect={handlePromotion}
-                  boardOrientation={playerColor}
-                  customBoardStyle={{
-                    borderRadius: '6px',
-                  }}
-                  customDarkSquareStyle={{
-                    backgroundColor: isDarkMode ? '#475569' : '#64748b'
-                  }}
-                  customLightSquareStyle={{
-                    backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9'
-                  }}
-                  customSquareStyles={getSquareStyles()}
-                  showBoardNotation={boardWidth > 280}
-                  boardWidth={boardWidth}
-                />
+            {/* Chess board container with proper spacing */}
+            <div className="flex justify-center mb-6">
+              <div className="chess-board-wrapper p-4 rounded-xl" style={{ 
+                backgroundColor: 'var(--color-surface)',
+                border: '1px solid var(--color-border)'
+              }}>
+                <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`} style={{ width: boardWidth, height: boardWidth }}>
+                  <Chessboard
+                    position={game.fen()}
+                    onPieceDrop={handleMove}
+                    onPromotionPieceSelect={handlePromotion}
+                    boardOrientation={playerColor}
+                    customBoardStyle={{
+                      borderRadius: '8px',
+                    }}
+                    customDarkSquareStyle={{
+                      backgroundColor: isDarkMode ? '#475569' : '#64748b'
+                    }}
+                    customLightSquareStyle={{
+                      backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9'
+                    }}
+                    customSquareStyles={getSquareStyles()}
+                    showBoardNotation={boardWidth > 300}
+                    boardWidth={boardWidth}
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Compact controls */}
-            <div className="flex flex-col items-center gap-1 sm:gap-2">
+            {/* Controls with proper spacing */}
+            <div className="flex flex-col items-center gap-4">
               <button
                 onClick={showHint}
-                className="btn-secondary flex items-center gap-1 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm min-w-[100px] sm:min-w-[120px] justify-center"
+                className="btn-secondary flex items-center gap-2 px-6 py-3 text-sm min-w-[140px] justify-center"
                 disabled={isCompleted}
               >
-                <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4" />
+                <Lightbulb className="w-4 h-4" />
                 <span>Hint {hintsUsed > 0 && `(${hintsUsed})`}</span>
               </button>
 
               {wrongMove && (
-                <div className="animate-fade-in w-full max-w-xs">
-                  <div className="bg-red-500/20 border border-red-500/30 rounded-lg px-2 py-1 sm:px-3 sm:py-2">
-                    <p className="text-red-300 font-medium text-center text-xs sm:text-sm">
+                <div className="animate-fade-in w-full max-w-md">
+                  <div className="bg-red-500/20 border border-red-500/30 rounded-lg px-4 py-3">
+                    <p className="text-red-300 font-medium text-center text-sm">
                       Wrong move! Try again.
                     </p>
                   </div>
@@ -731,15 +736,15 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
             </div>
           </div>
 
-          {/* Compact progress sidebar */}
+          {/* Progress sidebar */}
           <aside className="lg:col-span-4 order-2">
-            <div className="card p-2 sm:p-3 lg:p-4">
-              <div className="flex items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
-                <Target className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
-                <h3 className="text-xs sm:text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
+            <div className="card p-4 sm:p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Target className="w-5 h-5 text-green-400" />
+                <h3 className="text-base font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
               </div>
               
-              <div className="rounded-lg p-2 sm:p-3 min-h-[80px] sm:min-h-[100px] lg:min-h-[120px] flex items-center justify-center border" style={{ 
+              <div className="rounded-lg p-4 min-h-[120px] flex items-center justify-center border" style={{ 
                 backgroundColor: 'var(--color-surface)',
                 borderColor: 'var(--color-border)'
               }}>
@@ -747,10 +752,10 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
               </div>
               
               {isCompleted && (
-                <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-green-500/20 border border-green-500/30 rounded-lg">
-                  <div className="flex items-center gap-1 sm:gap-2 mb-1">
-                    <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
-                    <span className="text-green-300 font-medium text-xs sm:text-sm">Puzzle Complete!</span>
+                <div className="mt-4 p-4 bg-green-500/20 border border-green-500/30 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Zap className="w-4 h-4 text-green-400" />
+                    <span className="text-green-300 font-medium text-sm">Puzzle Complete!</span>
                   </div>
                   <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                     Solved in {formatTime(finalTimeRef.current)} with {hintsUsed} hints
