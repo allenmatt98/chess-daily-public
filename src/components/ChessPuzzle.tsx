@@ -622,12 +622,15 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
                   <p className="text-lg" style={{ color: 'var(--color-text-muted)' }}>{puzzleObjective}</p>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--color-border)' }}>
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg border" style={{ 
+                    backgroundColor: 'var(--color-surface)',
+                    borderColor: 'var(--color-border)'
+                  }}>
                     <Clock className="w-4 h-4 text-green-400" />
                     <span className="font-mono" style={{ color: 'var(--color-text)' }}>{formatTime(elapsedTime)}</span>
                   </div>
                   {hintsUsed > 0 && (
-                    <div className="flex items-center gap-2 px-3 py-2 bg-yellow-500/20 rounded-lg">
+                    <div className="flex items-center gap-2 px-3 py-2 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
                       <Lightbulb className="w-4 h-4 text-yellow-400" />
                       <span className="text-yellow-300 font-medium">{hintsUsed}</span>
                     </div>
@@ -656,10 +659,10 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
                 borderRadius: '12px',
               }}
               customDarkSquareStyle={{
-                backgroundColor: isDarkMode ? '#475569' : '#8b5cf6'
+                backgroundColor: isDarkMode ? '#475569' : '#64748b'
               }}
               customLightSquareStyle={{
-                backgroundColor: isDarkMode ? '#cbd5e1' : '#f3f4f6'
+                backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9'
               }}
               customSquareStyles={getSquareStyles()}
               showBoardNotation={true}
@@ -698,7 +701,10 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
               <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
             </div>
             
-            <div className="rounded-xl p-4 min-h-[200px] flex items-center justify-center" style={{ backgroundColor: 'var(--color-border)' }}>
+            <div className="rounded-xl p-4 min-h-[200px] flex items-center justify-center border" style={{ 
+              backgroundColor: 'var(--color-surface)',
+              borderColor: 'var(--color-border)'
+            }}>
               {renderProgressGrid()}
             </div>
             

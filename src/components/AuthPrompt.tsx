@@ -38,7 +38,9 @@ export function AuthPrompt({ onSignIn }: AuthPromptProps) {
       </div>
 
       <div className="text-center">
-        <p className="text-slate-300 mb-4">Sign in to save your progress and compete with others!</p>
+        <p className="mb-4" style={{ color: 'var(--color-text-muted)' }}>
+          Sign in to save your progress and compete with others!
+        </p>
         <button
           onClick={onSignIn}
           className="btn-primary flex items-center gap-2 mx-auto"
