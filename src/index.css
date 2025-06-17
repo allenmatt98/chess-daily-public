@@ -110,7 +110,7 @@
     flex-shrink: 0;
   }
 
-  /* Clean progress cell styles without thick borders */
+  /* Clean progress cell styles without thick borders - ALL COLORS FIXED */
   .progress-cell.correct {
     background-color: #22c55e;
     color: white;
