@@ -642,7 +642,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
             </div>
           </div>
 
-          {/* Chess board */}
+          {/* Chess board with enhanced dark theme styling */}
           <div className="chess-board-container mb-6">
             <Chessboard
               position={game.fen()}
@@ -652,7 +652,15 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
               customBoardStyle={{
                 borderRadius: '12px',
               }}
+              customDarkSquareStyle={{
+                backgroundColor: '#475569'
+              }}
+              customLightSquareStyle={{
+                backgroundColor: '#cbd5e1'
+              }}
               customSquareStyles={getSquareStyles()}
+              showBoardNotation={true}
+              boardWidth={Math.min(500, window.innerWidth - 64)}
             />
           </div>
 
