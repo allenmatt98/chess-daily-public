@@ -43,7 +43,16 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-1 sm:gap-2 px-2 py-1 sm:px-3 sm:py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    min-height: 32px; /* Smaller minimum touch target */
+    font-size: 0.75rem; /* Default to smaller text */
+  }
+
+  @media (min-width: 640px) {
+    .btn {
+      min-height: 36px;
+      font-size: 0.875rem;
+    }
   }
 
   .btn-primary {
@@ -63,7 +72,7 @@
   }
 
   .card {
-    @apply rounded-xl shadow-xl transition-all duration-300;
+    @apply rounded-lg sm:rounded-xl shadow-xl transition-all duration-300;
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
   }
@@ -83,27 +92,48 @@
 
   .chess-board-container {
     @apply relative mx-auto;
-    padding: 8px;
-    border-radius: 16px;
-    border: 2px solid var(--color-border);
+    padding: 3px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
     transition: all 0.3s ease;
   }
 
   /* Responsive chess board adjustments */
   @media (min-width: 640px) {
     .chess-board-container {
-      padding: 12px;
-      border-radius: 20px;
+      padding: 6px;
+      border-radius: 12px;
+      border-width: 2px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .chess-board-container {
+      padding: 8px;
+      border-radius: 16px;
     }
   }
 
   .progress-grid {
-    @apply grid gap-1;
+    @apply grid gap-0.5 sm:gap-1;
   }
 
   .progress-cell {
-    @apply w-6 h-6 sm:w-8 sm:h-8 rounded-md border-2 flex items-center justify-center text-sm sm:text-lg font-medium transition-all duration-200;
+    @apply w-3 h-3 sm:w-4 sm:h-4 lg:w-6 lg:h-6 rounded border flex items-center justify-center text-xs font-medium transition-all duration-200;
     border-color: var(--color-border);
+    font-size: 0.6rem;
+  }
+
+  @media (min-width: 640px) {
+    .progress-cell {
+      font-size: 0.75rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .progress-cell {
+      font-size: 0.875rem;
+    }
   }
 
   .progress-cell.correct {
@@ -129,23 +159,23 @@
   }
 
   .stat-card {
-    @apply rounded-lg p-3 sm:p-4 transition-all duration-300;
+    @apply rounded-lg p-1.5 sm:p-2 lg:p-3 transition-all duration-300;
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
   }
 
   .stat-value {
-    @apply text-xl sm:text-2xl font-bold text-green-400;
+    @apply text-sm sm:text-lg lg:text-xl font-bold text-green-400;
   }
 
   .stat-label {
-    @apply text-xs sm:text-sm font-medium;
+    @apply text-xs font-medium;
     color: var(--color-text-muted);
   }
 
   /* Theme toggle button */
   .theme-toggle {
-    @apply relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+    @apply relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
     background-color: var(--color-border);
   }
 
@@ -154,15 +184,15 @@
   }
 
   .theme-toggle-thumb {
-    @apply inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200;
+    @apply inline-block h-3 w-3 sm:h-4 sm:w-4 transform rounded-full bg-white transition-transform duration-200;
   }
 
   .theme-toggle.dark .theme-toggle-thumb {
-    @apply translate-x-6;
+    @apply translate-x-5 sm:translate-x-6;
   }
 
   .theme-toggle:not(.dark) .theme-toggle-thumb {
-    @apply translate-x-1;
+    @apply translate-x-0.5 sm:translate-x-1;
   }
 }
 
@@ -214,7 +244,7 @@
 .dark .chess-board-container {
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   box-shadow: 
-    0 20px 40px -12px rgba(0, 0, 0, 0.5),
+    0 4px 12px -2px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(148, 163, 184, 0.1),
     inset 0 1px 0 rgba(148, 163, 184, 0.1);
 }
@@ -223,13 +253,13 @@
 :root:not(.dark) .chess-board-container {
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   box-shadow: 
-    0 20px 40px -12px rgba(0, 0, 0, 0.15),
+    0 4px 12px -2px rgba(0, 0, 0, 0.1),
     0 0 0 1px rgba(148, 163, 184, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .chess-board-container .react-chessboard {
-  border-radius: 8px !important;
+  border-radius: 4px !important;
   overflow: hidden !important;
   transition: all 0.3s ease !important;
 }
@@ -243,13 +273,13 @@
   background-color: #cbd5e1 !important;
 }
 
-/* Light theme square colors - Better contrast and more professional */
+/* Light theme square colors */
 :root:not(.dark) .chess-board-container [data-square-color="dark"] {
-  background-color: #64748b !important; /* Slate-500 instead of purple */
+  background-color: #64748b !important;
 }
 
 :root:not(.dark) .chess-board-container [data-square-color="light"] {
-  background-color: #f1f5f9 !important; /* Slate-50 for better contrast */
+  background-color: #f1f5f9 !important;
 }
 
 /* Highlight colors for moves and hints */
@@ -259,7 +289,7 @@
 
 /* Piece shadow for better visibility */
 .chess-board-container .piece {
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2)) !important;
 }
 
 /* Hover effects for squares */
@@ -274,24 +304,6 @@
   box-shadow: inset 0 0 0 3px rgba(34, 197, 94, 0.6) !important;
 }
 
-/* Possible move indicators */
-.chess-board-container .possible-move {
-  position: relative;
-}
-
-.chess-board-container .possible-move::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  background-color: rgba(34, 197, 94, 0.6);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
 /* Coordinate labels styling */
 .chess-board-container .coordinate {
   font-weight: 600 !important;
@@ -303,7 +315,7 @@
 }
 
 :root:not(.dark) .chess-board-container .coordinate {
-  color: #475569 !important; /* Darker for better visibility in light mode */
+  color: #475569 !important;
 }
 
 /* Last move highlighting */
@@ -330,7 +342,7 @@
 
 /* Custom scrollbar for both themes */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .dark ::-webkit-scrollbar-track {
@@ -343,12 +355,12 @@
 
 .dark ::-webkit-scrollbar-thumb {
   background: #475569;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 :root:not(.dark) ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
@@ -362,61 +374,111 @@
 /* Mobile-specific responsive adjustments */
 @media (max-width: 640px) {
   .chess-board-container {
-    padding: 6px;
-    border-radius: 12px;
+    padding: 2px;
+    border-radius: 6px;
     border-width: 1px;
   }
   
   .chess-board-container .react-chessboard {
-    border-radius: 6px !important;
+    border-radius: 3px !important;
   }
 
-  /* Smaller progress cells on mobile */
-  .progress-cell {
-    @apply w-5 h-5 text-xs;
+  /* Ensure header doesn't get cut off */
+  header {
+    min-height: 48px;
   }
 
-  /* Adjust button sizes for mobile */
-  .btn {
-    @apply px-2 py-1.5 text-sm;
-  }
-
-  /* Smaller stat cards on mobile */
-  .stat-card {
+  /* Better spacing for mobile */
+  .card {
     @apply p-2;
   }
 
-  .stat-value {
-    @apply text-lg;
+  /* Ensure touch targets are large enough */
+  button {
+    min-height: 32px;
+    min-width: 32px;
   }
 
-  .stat-label {
+  /* Prevent text from being too small */
+  .text-xs {
+    font-size: 0.7rem;
+  }
+
+  /* Better line height for readability */
+  p, span, div {
+    line-height: 1.3;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .chess-board-container {
+    padding: 1px;
+    border-radius: 4px;
+  }
+
+  .progress-cell {
+    @apply w-2.5 h-2.5;
+    font-size: 0.5rem;
+  }
+
+  .btn {
+    @apply px-1.5 py-1 text-xs;
+    min-height: 28px;
+  }
+
+  .stat-value {
     @apply text-xs;
   }
+
+  .card {
+    @apply p-1.5;
+  }
+
+  header {
+    min-height: 44px;
+  }
 }
 
-/* Tablet adjustments */
-@media (min-width: 641px) and (max-width: 1023px) {
+/* Landscape mobile adjustments */
+@media (max-width: 896px) and (orientation: landscape) {
   .chess-board-container {
-    padding: 10px;
-    border-radius: 18px;
+    max-height: 50vh;
+    width: auto;
+    aspect-ratio: 1;
   }
-  
-  .chess-board-container .react-chessboard {
-    border-radius: 10px !important;
+
+  .min-h-screen {
+    min-height: 100vh;
   }
 }
 
-/* Ensure touch targets are large enough on mobile */
-@media (max-width: 640px) {
-  button {
-    min-height: 44px;
-    min-width: 44px;
+/* Ensure no horizontal overflow */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+}
+
+/* Fix for very small screens */
+@media (max-width: 360px) {
+  .chess-board-container {
+    width: calc(100vw - 16px) !important;
+    height: calc(100vw - 16px) !important;
+    max-width: 280px;
+    max-height: 280px;
   }
-  
-  .theme-toggle {
-    min-height: 44px;
-    min-width: 44px;
-    @apply flex items-center justify-center;
+
+  .btn {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .progress-cell {
+    width: 0.5rem;
+    height: 0.5rem;
+    font-size: 0.4rem;
   }
 }

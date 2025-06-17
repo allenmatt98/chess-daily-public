@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogIn, Crown, Zap, Sun, Moon, Menu } from 'lucide-react';
+import { LogIn, Crown, Zap, Sun, Moon } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useTheme } from '../hooks/useTheme';
 
@@ -26,52 +26,52 @@ export function Header({
       borderColor: 'var(--color-border)',
       backgroundColor: `${isDarkMode ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)'}`
     }}>
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-        <div className="flex items-center justify-between h-12 sm:h-16">
-          {/* Logo and left actions - responsive */}
-          <div className="flex items-center gap-1 sm:gap-3 min-w-0 flex-1">
-            <div className="flex items-center gap-1 sm:gap-2 cursor-pointer group min-w-0" onClick={onLogoClick}>
-              <div className="w-7 h-7 sm:w-10 sm:h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center relative overflow-hidden group-hover:scale-105 transition-transform duration-200 flex-shrink-0">
-                <Crown className="w-3 h-3 sm:w-6 sm:h-6 text-white" />
-                <div className="absolute inset-0 bg-white/10 rounded-lg"></div>
+      <div className="max-w-7xl mx-auto px-2 sm:px-4">
+        <div className="flex items-center justify-between h-12 sm:h-14 lg:h-16">
+          {/* Logo section - optimized for mobile */}
+          <div className="flex items-center gap-1 min-w-0 flex-shrink-0">
+            <div className="flex items-center gap-1 cursor-pointer group" onClick={onLogoClick}>
+              <div className="w-5 h-5 sm:w-7 sm:h-7 lg:w-8 lg:h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-md flex items-center justify-center relative overflow-hidden group-hover:scale-105 transition-transform duration-200 flex-shrink-0">
+                <Crown className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-white" />
+                <div className="absolute inset-0 bg-white/10 rounded-md"></div>
               </div>
               <div className="flex flex-col min-w-0">
-                <h1 className="text-sm sm:text-lg font-bold brand-text truncate" style={{ color: 'var(--color-text)' }}>Chess Daily</h1>
-                <span className="text-xs font-medium -mt-0.5 hidden sm:block" style={{ color: 'var(--color-text-muted)' }}>Daily Puzzles</span>
+                <h1 className="text-xs sm:text-sm lg:text-base font-bold brand-text truncate leading-tight" style={{ color: 'var(--color-text)' }}>
+                  Chess Daily
+                </h1>
+                <span className="text-xs font-medium -mt-0.5 hidden sm:block leading-tight" style={{ color: 'var(--color-text-muted)' }}>
+                  Daily Puzzles
+                </span>
               </div>
             </div>
-            {leftActions && (
-              <div className="ml-1 sm:ml-4 flex items-center gap-1 min-w-0 overflow-hidden">{leftActions}</div>
-            )}
           </div>
-          
-          {/* Right side controls - responsive */}
-          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-            {/* Theme Toggle - smaller on mobile */}
+
+          {/* Right side controls - highly optimized for mobile */}
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {/* Theme Toggle - compact */}
             <button
               onClick={toggleTheme}
-              className="relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex-shrink-0"
+              className="relative inline-flex h-5 w-9 sm:h-6 sm:w-10 lg:h-7 lg:w-12 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-green-500 flex-shrink-0"
               style={{ 
                 backgroundColor: isDarkMode ? '#22c55e' : 'var(--color-border)',
-                focusRingOffsetColor: 'var(--color-background)'
               }}
               aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
             >
               <span className="sr-only">Toggle theme</span>
-              <div className={`inline-block h-3 w-3 sm:h-4 sm:w-4 transform rounded-full bg-white transition-transform duration-200 flex items-center justify-center ${
-                isDarkMode ? 'translate-x-5 sm:translate-x-6' : 'translate-x-1'
+              <div className={`inline-block h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5 transform rounded-full bg-white transition-transform duration-200 flex items-center justify-center ${
+                isDarkMode ? 'translate-x-4 sm:translate-x-5 lg:translate-x-6' : 'translate-x-0.5 sm:translate-x-1'
               }`}>
                 {isDarkMode ? (
-                  <Moon className="w-2 h-2 sm:w-3 sm:h-3 text-green-600" />
+                  <Moon className="w-1.5 h-1.5 sm:w-2 sm:h-2 lg:w-3 lg:h-3 text-green-600" />
                 ) : (
-                  <Sun className="w-2 h-2 sm:w-3 sm:h-3 text-yellow-500" />
+                  <Sun className="w-1.5 h-1.5 sm:w-2 sm:h-2 lg:w-3 lg:h-3 text-yellow-500" />
                 )}
               </div>
             </button>
 
-            {/* How to Play button - responsive text */}
+            {/* How to Play button - very compact on mobile */}
             <button
-              className="text-xs sm:text-sm font-medium transition-colors duration-200 focus:outline-none px-1 sm:px-2 py-1 rounded whitespace-nowrap"
+              className="text-xs sm:text-sm font-medium transition-colors duration-200 focus:outline-none px-1 sm:px-2 py-1 rounded whitespace-nowrap min-w-0 flex-shrink-0"
               style={{ 
                 color: 'var(--color-text-muted)',
               }}
@@ -86,19 +86,19 @@ export function Header({
             
             {user ? (
               <>
-                {/* User info - hidden on small screens */}
-                <div className="hidden md:flex items-center gap-1 sm:gap-2 px-2 py-1 rounded-lg border transition-all duration-300" style={{
+                {/* User info - only show on larger screens */}
+                <div className="hidden lg:flex items-center gap-1 px-2 py-1 rounded-lg border transition-all duration-300 max-w-24" style={{
                   backgroundColor: 'var(--color-surface)',
                   borderColor: 'var(--color-border)'
                 }}>
                   <Zap className="w-3 h-3 text-green-400 flex-shrink-0" />
-                  <span className="text-xs truncate max-w-20" style={{ color: 'var(--color-text)' }}>
+                  <span className="text-xs truncate" style={{ color: 'var(--color-text)' }}>
                     {user.email?.split('@')[0]}
                   </span>
                 </div>
                 <button
                   onClick={onSignOut}
-                  className="btn-secondary text-xs px-2 py-1 whitespace-nowrap"
+                  className="btn-secondary text-xs px-2 py-1 whitespace-nowrap min-w-0 flex-shrink-0"
                 >
                   <span className="hidden sm:inline">Sign Out</span>
                   <span className="sm:hidden">Out</span>
@@ -107,14 +107,23 @@ export function Header({
             ) : (
               <button
                 onClick={onSignIn}
-                className="btn-primary text-xs px-2 py-1 flex items-center gap-1"
+                className="btn-primary text-xs px-2 py-1 flex items-center gap-1 min-w-0 flex-shrink-0"
               >
-                <LogIn className="w-3 h-3" />
+                <LogIn className="w-3 h-3 flex-shrink-0" />
                 <span className="hidden sm:inline">Sign In</span>
               </button>
             )}
           </div>
         </div>
+
+        {/* Mobile left actions - shown below header on small screens */}
+        {leftActions && (
+          <div className="sm:hidden pb-2 border-t" style={{ borderColor: 'var(--color-border)' }}>
+            <div className="flex items-center gap-2 pt-2">
+              {leftActions}
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
