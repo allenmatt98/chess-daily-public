@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,17 +6,23 @@
 
 @layer base {
   :root {
-    --color-primary-rgb: 29, 161, 242;
+    --color-primary-rgb: 34, 197, 94;
     --color-primary: rgb(var(--color-primary-rgb));
-    --color-secondary: #657786;
-    --color-background: #F7F9FA;
-    --color-border: #E1E8ED;
-    --color-text: #14171A;
+    --color-secondary: #6b7280;
+    --color-background: #0f172a;
+    --color-surface: #1e293b;
+    --color-border: #334155;
+    --color-text: #f8fafc;
+    --color-text-muted: #94a3b8;
+  }
+
+  * {
+    border-color: var(--color-border);
   }
 
   body {
-    @apply bg-[--color-background] text-[--color-text] antialiased min-h-screen;
-    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    @apply bg-slate-900 text-slate-100 antialiased min-h-screen;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
 
   #root {
@@ -26,70 +32,78 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900;
   }
 
   .btn-primary {
-    @apply btn bg-[--color-primary] text-white hover:bg-primary-90 focus:ring-primary/50;
+    @apply btn bg-green-500 text-white hover:bg-green-600 focus:ring-green-500 shadow-lg hover:shadow-xl;
   }
 
   .btn-secondary {
-    @apply btn bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-gray-400/50;
+    @apply btn bg-slate-700 text-slate-200 hover:bg-slate-600 focus:ring-slate-500 border border-slate-600;
   }
 
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-[--color-border] transition-all duration-200;
+    @apply bg-slate-800 rounded-xl border border-slate-700 shadow-xl;
   }
 
-  .card-hover {
-    @apply hover:shadow-md hover:border-[--color-border] hover:border-opacity-80;
+  .surface {
+    @apply bg-slate-800 border border-slate-700;
+  }
+
+  .text-primary {
+    @apply text-green-400;
+  }
+
+  .text-muted {
+    @apply text-slate-400;
   }
 
   .chess-board-container {
     @apply relative mx-auto;
-    width: min(calc(100vw - 2rem), min(600px, 80vh));
+    width: min(calc(100vw - 2rem), min(500px, 70vh));
     aspect-ratio: 1;
   }
 
-  .progress-bar-container {
-    @apply relative bg-gray-100 rounded-lg overflow-hidden;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  .progress-grid {
+    @apply grid gap-1;
   }
 
-  .progress-bar-fill {
-    @apply absolute bottom-0 left-0 right-0 bg-green-500 transition-all duration-500 ease-out;
+  .progress-cell {
+    @apply w-8 h-8 rounded-md border-2 border-slate-600 flex items-center justify-center text-lg font-medium transition-all duration-200;
+  }
+
+  .progress-cell.correct {
+    @apply bg-green-500 border-green-500 text-white;
+  }
+
+  .progress-cell.partial {
+    @apply bg-yellow-500 border-yellow-500 text-white;
+  }
+
+  .progress-cell.wrong {
+    @apply bg-red-500 border-red-500 text-white;
+  }
+
+  .progress-cell.hint {
+    @apply bg-slate-600 border-slate-500 text-slate-300;
   }
 
   .brand-text {
     @apply font-bold tracking-wide;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
 
-  @media (max-width: 640px) {
-    .chess-board-container {
-      width: min(calc(100vw - 2rem), 100%);
-      margin: 0 auto;
-    }
+  .stat-card {
+    @apply bg-slate-800 rounded-lg p-4 border border-slate-700;
+  }
 
-    .mobile-progress-bar {
-      @apply h-2 w-full mt-4;
-    }
+  .stat-value {
+    @apply text-2xl font-bold text-green-400;
+  }
 
-    .card {
-      @apply p-3;
-    }
-
-    h1 {
-      @apply text-xl;
-    }
-
-    h2 {
-      @apply text-lg;
-    }
-
-    .btn {
-      @apply px-3 py-1.5 text-sm;
-    }
+  .stat-label {
+    @apply text-sm text-slate-400 font-medium;
   }
 }
 
@@ -104,39 +118,59 @@
   }
 }
 
-@keyframes container-scale {
-  0% {
-    transform: scale(0.5);
+@keyframes scale-up {
+  from {
     opacity: 0;
+    transform: scale(0.95);
   }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
+  to {
     opacity: 1;
-  }
-}
-
-@keyframes text-glow {
-  0%, 100% {
-    filter: brightness(100%);
     transform: scale(1);
   }
+}
+
+@keyframes pulse-green {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+  }
   50% {
-    filter: brightness(120%);
-    transform: scale(1.05);
+    box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
   }
 }
 
-canvas {
-  z-index: 40 !important;
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
 }
 
-.main-content {
-  @apply flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6;
+.animate-scale-up {
+  animation: scale-up 0.2s ease-out;
 }
 
-.footer-container {
-  @apply mt-auto;
+.animate-pulse-green {
+  animation: pulse-green 2s infinite;
+}
+
+/* Chess board styling adjustments for dark theme */
+.chess-board-container .react-chessboard {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }

@@ -9,29 +9,29 @@ interface UserStatsProps {
 
 export function UserStats({ rating, currentStreak, highestStreak }: UserStatsProps) {
   return (
-    <div className="card p-4 sm:p-6 grid grid-cols-3 gap-4">
-      <div className="text-center">
-        <div className="flex items-center justify-center mb-2">
-          <TrendingUp className="w-5 h-5 text-blue-500" />
+    <div className="card p-6 grid grid-cols-3 gap-6">
+      <div className="stat-card text-center">
+        <div className="flex items-center justify-center mb-3">
+          <TrendingUp className="w-6 h-6 text-green-400" />
         </div>
-        <div className="text-sm text-gray-500">Rating</div>
-        <div className="text-xl font-bold text-blue-600">{rating}</div>
+        <div className="stat-label">Rating</div>
+        <div className="stat-value">{rating}</div>
       </div>
       
-      <div className="text-center">
-        <div className="flex items-center justify-center mb-2">
-          <Trophy className="w-5 h-5 text-yellow-500" />
+      <div className="stat-card text-center">
+        <div className="flex items-center justify-center mb-3">
+          <Trophy className="w-6 h-6 text-yellow-400" />
         </div>
-        <div className="text-sm text-gray-500">Current Streak</div>
-        <div className="text-xl font-bold text-yellow-600">{currentStreak}</div>
+        <div className="stat-label">Current Streak</div>
+        <div className="stat-value text-yellow-400">{currentStreak}</div>
       </div>
       
-      <div className="text-center">
-        <div className="flex items-center justify-center mb-2">
-          <Star className="w-5 h-5 text-purple-500" />
+      <div className="stat-card text-center">
+        <div className="flex items-center justify-center mb-3">
+          <Star className="w-6 h-6 text-purple-400" />
         </div>
-        <div className="text-sm text-gray-500">Best Streak</div>
-        <div className="text-xl font-bold text-purple-600">{highestStreak}</div>
+        <div className="stat-label">Best Streak</div>
+        <div className="stat-value text-purple-400">{highestStreak}</div>
       </div>
     </div>
   );

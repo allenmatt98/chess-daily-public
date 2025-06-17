@@ -5,38 +5,33 @@ import { VictoryCelebration } from './VictoryCelebration';
 import { useAuthStore } from '../store/authStore';
 import { updateGuestStats } from '../lib/guestStats';
 import { savePuzzleCompletion, getPuzzleCompletion } from '../lib/completionStorage';
+import { Lightbulb, Clock, Target, Zap } from 'lucide-react';
 import type { ChessPuzzleProps } from '../types';
 import type { UserStats } from '../lib/puzzleService';
 
 export const ATTEMPT_CLASS = {
-  WRONG: 'wrong', // 🔲
-  RIGHT_PIECE: 'right_piece', // 🟨
-  CORRECT: 'correct', // 🟩
+  WRONG: 'wrong',
+  RIGHT_PIECE: 'right_piece',
+  CORRECT: 'correct',
 } as const;
 
 export type AttemptClassification = typeof ATTEMPT_CLASS[keyof typeof ATTEMPT_CLASS];
 
 interface AttemptRecord {
-  moveIndex: number; // which move in the solution
+  moveIndex: number;
   timestamp: number;
   classification: AttemptClassification;
   hintUsed?: boolean;
 }
 
 export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
-  console.log('ChessPuzzle received props:', { puzzle }); // Debug log
-
-  // Early return if puzzle or required fields are missing
   if (!puzzle?.fen) {
-    console.log('Missing puzzle or FEN, showing loading state'); // Debug log
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-lg text-gray-600">Loading puzzle...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
       </div>
     );
   }
-
-  console.log('Initializing ChessPuzzle with FEN:', puzzle.fen); // Debug log
 
   const [game, setGame] = useState(new Chess(puzzle.fen));
   const [currentMoveIndex, setCurrentMoveIndex] = useState(0);
@@ -69,7 +64,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     Math.floor((currentMoveIndex / 2) / movesToMate * 100);
 
   const [attemptHistory, setAttemptHistory] = useState<AttemptRecord[][]>(() => {
-    // Try to load from localStorage for this puzzle
     const key = `attemptHistory_${puzzle.id}`;
     const stored = localStorage.getItem(key);
     if (stored) {
@@ -77,17 +71,14 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         return JSON.parse(stored);
       } catch {}
     }
-    // Initialize as empty arrays for each move
     return Array.from({ length: Math.ceil((puzzle.moves || []).length) }, () => []);
   });
 
-  // Persist attemptHistory to localStorage
   useEffect(() => {
     const key = `attemptHistory_${puzzle.id}`;
     localStorage.setItem(key, JSON.stringify(attemptHistory));
   }, [attemptHistory, puzzle.id]);
 
-  // Clear attemptHistory when starting a new puzzle
   useEffect(() => {
     setAttemptHistory(Array.from({ length: Math.ceil((puzzle.moves || []).length) }, () => []));
   }, [puzzle.id]);
@@ -96,7 +87,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     const initialTurn = puzzle.fen.split(' ')[1] === 'w' ? 'White' : 'Black';
     setPuzzleObjective(`${initialTurn} to play and mate in ${movesToMate}`);
 
-    // Check if puzzle was already completed
     const completion = getPuzzleCompletion(puzzle.id);
     if (completion) {
       setIsCompleted(true);
@@ -104,7 +94,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       setElapsedTime(completion.timeTaken);
       setHintsUsed(completion.hintsUsed);
       
-      // Replay the completed moves
       const gameCopy = new Chess(puzzle.fen);
       completion.moves.forEach(move => {
         try {
@@ -120,26 +109,24 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       setGame(gameCopy);
       setCurrentMoveIndex(completion.moves.length);
       
-      // Only show victory if not already shown in this session
       if (!victoryShownThisSession && !sessionStorage.getItem(`victory_shown_${puzzle.id}`)) {
-      setTimeout(() => {
-        if (!user) {
-          const guestStats = updateGuestStats(puzzle.id, completion.timeTaken, completion.hintsUsed);
-          setVictoryStats({
-            rating: guestStats.rating,
-            ratingChange: guestStats.rating - 1000,
-            streak: guestStats.currentStreak
-          });
-        }
-        setShowVictory(true);
+        setTimeout(() => {
+          if (!user) {
+            const guestStats = updateGuestStats(puzzle.id, completion.timeTaken, completion.hintsUsed);
+            setVictoryStats({
+              rating: guestStats.rating,
+              ratingChange: guestStats.rating - 1000,
+              streak: guestStats.currentStreak
+            });
+          }
+          setShowVictory(true);
           setVictoryShownThisSession(true);
           sessionStorage.setItem(`victory_shown_${puzzle.id}`, '1');
-      }, 500);
+        }, 500);
       }
       return;
     }
 
-    // Reset state for new puzzle
     startTimeRef.current = Date.now();
     finalTimeRef.current = 0;
     setElapsedTime(0);
@@ -150,7 +137,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     setGame(new Chess(puzzle.fen));
     setProcessingVictory(false);
 
-    // Start timer for new puzzle
     if (timerIntervalRef.current) {
       clearInterval(timerIntervalRef.current);
     }
@@ -183,12 +169,11 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     setHintsUsed(prev => prev + 1);
     setWrongMove(false);
 
-    // Record a hintUsed attempt for the current user move
     setAttemptHistory(prev => {
       return prev.map((arr, idx) => idx === currentMoveIndex ? [...arr, {
         moveIndex: currentMoveIndex,
         timestamp: Date.now(),
-        classification: ATTEMPT_CLASS.RIGHT_PIECE, // or another classification if needed
+        classification: ATTEMPT_CLASS.RIGHT_PIECE,
         hintUsed: true
       }] : arr);
     });
@@ -257,22 +242,19 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
            (piece.color === 'b' && targetRank === '1');
   };
 
-  // Helper to classify an attempt
   const classifyAttempt = (from: Square, to: Square, promotion?: string): AttemptClassification => {
     const expectedMove = moveSequence[currentMoveIndex];
     if (!expectedMove) return ATTEMPT_CLASS.WRONG;
     if (expectedMove.from === from && expectedMove.to === to) {
-      // If promotion is required, check it
       if (expectedMove.promotion) {
         if (promotion && expectedMove.promotion === promotion) {
           return ATTEMPT_CLASS.CORRECT;
         } else {
-          return ATTEMPT_CLASS.RIGHT_PIECE; // Right squares, wrong promotion
+          return ATTEMPT_CLASS.RIGHT_PIECE;
         }
       }
       return ATTEMPT_CLASS.CORRECT;
     }
-    // Check if the piece type matches but wrong destination
     const expectedPiece = game.get(expectedMove.from)?.type;
     const actualPiece = game.get(from)?.type;
     if (expectedPiece && actualPiece && expectedPiece === actualPiece) {
@@ -287,15 +269,13 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     const expectedMove = moveSequence[currentMoveIndex];
     if (!expectedMove) return false;
 
-    // If it's a promotion move, let the promotion handler handle it
     if (isPromotion(fromSquare, toSquare)) {
-      return false; // Let the promotion handler handle this move
+      return false;
     }
 
     setActiveHint(null);
     setHintPhase(null);
 
-    // --- Attempt tracking ---
     const classification = classifyAttempt(fromSquare, toSquare);
     setAttemptHistory(prev => {
       const updated = prev.map((arr, idx) => idx === currentMoveIndex ? [...arr, {
@@ -305,7 +285,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       }] : arr);
       return updated;
     });
-    // --- End attempt tracking ---
     
     if (expectedMove.from === fromSquare && expectedMove.to === toSquare) {
       setWrongMove(false);
@@ -359,10 +338,8 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     const expectedMove = moveSequence[currentMoveIndex];
     if (!expectedMove) return false;
 
-    // Verify the source and target squares match the expected move
     if (expectedMove.from !== fromSquare || expectedMove.to !== toSquare) {
       setWrongMove(true);
-      // --- Attempt tracking ---
       setAttemptHistory(prev => {
         const updated = prev.map((arr, idx) => idx === currentMoveIndex ? [...arr, {
           moveIndex: currentMoveIndex,
@@ -371,11 +348,9 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         }] : arr);
         return updated;
       });
-      // --- End attempt tracking ---
       return false;
     }
 
-    // Map the promotion piece to the correct format (q, r, b, n)
     const promotionMap: { [key: string]: string } = {
       'wQ': 'q', 'wR': 'r', 'wB': 'b', 'wN': 'n',
       'bQ': 'q', 'bR': 'r', 'bB': 'b', 'bN': 'n'
@@ -395,7 +370,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       return false;
     }
 
-    // --- Attempt tracking ---
     const classification = classifyAttempt(fromSquare, toSquare, promotionType);
     setAttemptHistory(prev => {
       const updated = prev.map((arr, idx) => idx === currentMoveIndex ? [...arr, {
@@ -405,9 +379,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       }] : arr);
       return updated;
     });
-    // --- End attempt tracking ---
 
-    // Verify the promotion type matches the expected move
     if (expectedMove.promotion && expectedMove.promotion !== promotionType) {
       setWrongMove(true);
       return false;
@@ -471,7 +443,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     setIsCompleting(true);
     setIsCompleted(true);
 
-    // Save completion state
     savePuzzleCompletion(puzzle.id, finalTimeRef.current, hintsUsed, moveSequence);
     
     try {
@@ -483,7 +454,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           streak: guestStats.currentStreak
         });
       } else if (onComplete) {
-        // For logged-in users, always show victory screen with current stats as fallback
         let currentStats = {
           rating: 1000,
           previousRating: 1000,
@@ -510,7 +480,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         });
       }
       
-      // Delay showing victory screen slightly to ensure state updates are complete
       setTimeout(() => {
         setShowVictory(true);
         setProcessingVictory(false);
@@ -527,17 +496,16 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     const styles: Record<string, { backgroundColor: string }> = {};
     
     if (activeHint.from) {
-      styles[activeHint.from] = { backgroundColor: 'rgba(255, 255, 0, 0.4)' };
+      styles[activeHint.from] = { backgroundColor: 'rgba(34, 197, 94, 0.4)' };
     }
     
     if (activeHint.to) {
-      styles[activeHint.to] = { backgroundColor: 'rgba(0, 255, 0, 0.4)' };
+      styles[activeHint.to] = { backgroundColor: 'rgba(34, 197, 94, 0.6)' };
     }
     
     return styles;
   };
 
-  // Share grid generation
   const generateShareGrid = useCallback(() => {
     const emojiMap = {
       [ATTEMPT_CLASS.WRONG]: '🟥',
@@ -545,10 +513,8 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       [ATTEMPT_CLASS.CORRECT]: '🟩',
       hint: '🏳️',
     };
-    // Only show columns for user's moves (every other move in moveSequence)
     const userMoveIndexes = Array.from({ length: Math.ceil((puzzle.moves || []).length / 2) }, (_, i) => i * 2);
     const cappedHistory = userMoveIndexes.map(idx => attemptHistory[idx]?.slice(-5) || []);
-    // Build grid rows (top to bottom, no extra spaces, always rectangular)
     const numCols = cappedHistory.length;
     const maxRows = Math.max(...cappedHistory.map(col => col.length), 1);
     const gridRows: string[] = [];
@@ -563,12 +529,11 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
             rowStr += emojiMap[attempt.classification];
           }
         } else {
-          rowStr += '⬜'; // Use block for alignment in share text
+          rowStr += '⬜';
         }
       }
       gridRows.push(rowStr);
     }
-    // Metadata
     const puzzleNum = puzzle.metadata?.absolute_number || puzzle.puzzle_number || puzzle.id;
     const mateType = `Mate in ${Math.ceil((puzzle.moves || []).length / 2)}`;
     const streak = victoryStats?.streak || 0;
@@ -585,7 +550,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     ].join('\n');
   }, [attemptHistory, puzzle, elapsedTime, victoryStats]);
 
-  // Progress grid for UI (same as share grid, but live)
   const renderProgressGrid = () => {
     const emojiMap = {
       [ATTEMPT_CLASS.WRONG]: '🟥',
@@ -594,42 +558,42 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       hint: '🏳️',
     };
     const bgMap = {
-      [ATTEMPT_CLASS.WRONG]: 'bg-red-200',
-      [ATTEMPT_CLASS.RIGHT_PIECE]: 'bg-yellow-100',
-      [ATTEMPT_CLASS.CORRECT]: 'bg-green-100',
-      hint: 'bg-gray-300',
+      [ATTEMPT_CLASS.WRONG]: 'wrong',
+      [ATTEMPT_CLASS.RIGHT_PIECE]: 'partial',
+      [ATTEMPT_CLASS.CORRECT]: 'correct',
+      hint: 'hint',
     };
-    // Only show columns for user's moves (every other move in moveSequence)
     const userMoveIndexes = Array.from({ length: Math.ceil((puzzle.moves || []).length / 2) }, (_, i) => i * 2);
     const cappedHistory = userMoveIndexes.map(idx => attemptHistory[idx]?.slice(-5) || []);
     const numUserMoves = userMoveIndexes.length;
     const maxRows = Math.max(...cappedHistory.map(col => col.length), 1);
+    
     return (
       <div className="flex flex-col items-center w-full">
-        <div className="flex flex-row gap-2">
+        <div className="progress-grid" style={{ gridTemplateColumns: `repeat(${numUserMoves}, 1fr)` }}>
           {Array.from({ length: numUserMoves }).map((_, colIdx) => (
             <div key={colIdx} className="flex flex-col gap-1">
               {Array.from({ length: maxRows }).map((_, rowIdx) => {
                 const attempt = cappedHistory[colIdx]?.[rowIdx];
                 let emoji = '';
-                let bg = 'bg-gray-200';
+                let className = 'progress-cell';
                 if (attempt) {
                   if (attempt.hintUsed) {
                     emoji = emojiMap.hint;
-                    bg = bgMap.hint;
+                    className += ' hint';
                   } else {
                     emoji = emojiMap[attempt.classification];
-                    bg = bgMap[attempt.classification];
+                    className += ` ${bgMap[attempt.classification]}`;
                   }
                 }
-  return (
-                  <span
+                return (
+                  <div
                     key={rowIdx}
-                    className={`text-2xl w-10 h-10 flex items-center justify-center rounded-lg border ${bg} ${attempt ? '' : 'border-gray-300'} transition-all duration-150`}
+                    className={className}
                     aria-label={attempt ? attempt.classification : 'empty'}
                   >
                     {emoji}
-                  </span>
+                  </div>
                 );
               })}
             </div>
@@ -640,67 +604,104 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Main grid layout: board + sidebar */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-0 max-w-7xl mx-auto w-full items-start">
-        {/* Board area (centered, 8/12 cols on desktop) */}
-        <div className="col-span-1 lg:col-span-8 flex flex-col items-center justify-start pt-0 pb-2 px-2 sm:px-4">
-          <div className="w-full flex flex-col items-center mb-1">
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">Puzzle #{puzzle.metadata?.absolute_number || 1}</h1>
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-700 bg-white/90 px-4 py-2 rounded-lg shadow-sm inline-block mb-1">
-          {puzzleObjective}
-              <span className="ml-3 inline-flex items-center gap-1 text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full text-xs font-medium align-middle">
-                <span role="img" aria-label="timer">⏱️</span>
-                {formatTime(elapsedTime)}
-              </span>
-        </h2>
-          </div>
-          <div className="flex flex-col items-center justify-center w-full">
-            {/* Chessboard container fix: larger max width, min width, and always centered */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-2 sm:p-4 transition-shadow duration-300 w-full max-w-3xl min-w-[320px] min-h-[320px] flex items-center justify-center mx-auto">
-              <Chessboard
-                position={game.fen()}
-                onPieceDrop={handleMove}
-                onPromotionPieceSelect={handlePromotion}
-                boardOrientation={playerColor}
-                customBoardStyle={{
-                  borderRadius: '12px',
-                }}
-                customSquareStyles={getSquareStyles()}
-              />
-            </div>
-            <div className="mt-3 flex flex-col items-center w-full">
-              <button
-                onClick={showHint}
-                className="btn-secondary flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm bg-blue-50 text-blue-700 hover:bg-blue-100 transition-all duration-150"
-                disabled={isCompleted}
-              >
-                Hint {hintsUsed > 0 && `(${hintsUsed})`}
-              </button>
-        </div>
-        {wrongMove && (
-              <div className="mt-3 text-center">
-            <div className="inline-block bg-red-50 border border-red-100 rounded-lg px-4 py-2 animate-[fade-in_0.2s_ease-out]">
-              <p className="text-red-600 font-bold text-[1.2em]">
-                Oops! Wrong move. Try again!
-              </p>
-            </div>
-          </div>
-        )}
-          </div>
-        </div>
-        {/* Sidebar: progress + extras (4/12 cols on desktop) */}
-        <aside className="col-span-1 lg:col-span-4 flex flex-col items-start justify-start py-8 px-2 sm:px-6 bg-white/95 rounded-l-3xl shadow-xl border-l border-gray-200 transition-all duration-300 min-h-full">
-          <div className="w-full max-w-xs">
-            <div className="mb-6">
-              <div className="font-bold text-lg text-gray-800 mb-2">Your Progress</div>
-              {/* Balanced padding and reduced height for progress grid */}
-              <div className="bg-gray-100 rounded-xl shadow-inner px-4 py-4 h-[220px] flex items-start justify-center">
-                {renderProgressGrid()}
+    <div className="min-h-screen bg-slate-900 flex flex-col">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-7xl mx-auto w-full items-start p-4">
+        {/* Main puzzle area */}
+        <div className="col-span-1 lg:col-span-8 flex flex-col items-center justify-start">
+          {/* Puzzle header */}
+          <div className="w-full max-w-2xl mb-6">
+            <div className="card p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h1 className="text-2xl font-bold text-slate-100 mb-1">
+                    Puzzle #{puzzle.metadata?.absolute_number || 1}
+                  </h1>
+                  <p className="text-lg text-slate-300">{puzzleObjective}</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 px-3 py-2 bg-slate-700 rounded-lg">
+                    <Clock className="w-4 h-4 text-green-400" />
+                    <span className="text-slate-200 font-mono">{formatTime(elapsedTime)}</span>
+                  </div>
+                  {hintsUsed > 0 && (
+                    <div className="flex items-center gap-2 px-3 py-2 bg-yellow-500/20 rounded-lg">
+                      <Lightbulb className="w-4 h-4 text-yellow-400" />
+                      <span className="text-yellow-300 font-medium">{hintsUsed}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Progress bar */}
+              <div className="w-full bg-slate-700 rounded-full h-2">
+                <div 
+                  className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${progressPercentage}%` }}
+                ></div>
               </div>
             </div>
-            {/* Placeholder for achievements or other sidebar content */}
-            {/* <div className="mt-8"> ... </div> */}
+          </div>
+
+          {/* Chess board */}
+          <div className="chess-board-container mb-6">
+            <Chessboard
+              position={game.fen()}
+              onPieceDrop={handleMove}
+              onPromotionPieceSelect={handlePromotion}
+              boardOrientation={playerColor}
+              customBoardStyle={{
+                borderRadius: '12px',
+              }}
+              customSquareStyles={getSquareStyles()}
+            />
+          </div>
+
+          {/* Controls */}
+          <div className="flex flex-col items-center gap-4">
+            <button
+              onClick={showHint}
+              className="btn-secondary flex items-center gap-2 px-6 py-3"
+              disabled={isCompleted}
+            >
+              <Lightbulb className="w-5 h-5" />
+              Hint {hintsUsed > 0 && `(${hintsUsed})`}
+            </button>
+
+            {wrongMove && (
+              <div className="animate-fade-in">
+                <div className="bg-red-500/20 border border-red-500/30 rounded-lg px-4 py-3">
+                  <p className="text-red-300 font-medium text-center">
+                    Wrong move! Try again.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Progress sidebar */}
+        <aside className="col-span-1 lg:col-span-4">
+          <div className="card p-6 sticky top-24">
+            <div className="flex items-center gap-2 mb-4">
+              <Target className="w-5 h-5 text-green-400" />
+              <h3 className="text-lg font-semibold text-slate-100">Your Progress</h3>
+            </div>
+            
+            <div className="bg-slate-700/50 rounded-xl p-4 min-h-[200px] flex items-center justify-center">
+              {renderProgressGrid()}
+            </div>
+            
+            {isCompleted && (
+              <div className="mt-4 p-4 bg-green-500/20 border border-green-500/30 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="w-5 h-5 text-green-400" />
+                  <span className="text-green-300 font-medium">Puzzle Complete!</span>
+                </div>
+                <p className="text-slate-300 text-sm">
+                  Solved in {formatTime(finalTimeRef.current)} with {hintsUsed} hints
+                </p>
+              </div>
+            )}
           </div>
         </aside>
       </div>
