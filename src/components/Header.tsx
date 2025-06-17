@@ -26,9 +26,9 @@ export function Header({
       borderColor: 'var(--color-border)',
       backgroundColor: `${isDarkMode ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)'}`
     }}>
-      <div className="max-w-7xl mx-auto px-2 sm:px-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4">
         <div className="flex items-center justify-between h-14 sm:h-16">
-          {/* Logo section - optimized for mobile */}
+          {/* Logo section */}
           <div className="flex items-center gap-2 min-w-0 flex-shrink-0">
             <div className="flex items-center gap-2 cursor-pointer group" onClick={onLogoClick}>
               <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-md flex items-center justify-center relative overflow-hidden group-hover:scale-105 transition-transform duration-200 flex-shrink-0">
@@ -46,9 +46,14 @@ export function Header({
             </div>
           </div>
 
-          {/* Right side controls - highly optimized for mobile */}
-          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-            {/* Theme Toggle - compact */}
+          {/* Center section - Puzzle Archives button for desktop/laptop */}
+          <div className="hidden lg:flex items-center">
+            {leftActions}
+          </div>
+
+          {/* Right side controls */}
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               className="relative inline-flex h-6 w-10 sm:h-7 sm:w-12 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-green-500 flex-shrink-0"
@@ -69,7 +74,7 @@ export function Header({
               </div>
             </button>
 
-            {/* How to Play button - very compact on mobile */}
+            {/* How to Play button */}
             <button
               className="text-xs sm:text-sm font-medium transition-colors duration-200 focus:outline-none px-2 py-1 rounded whitespace-nowrap min-w-0 flex-shrink-0"
               style={{ 
@@ -87,7 +92,7 @@ export function Header({
             {user ? (
               <>
                 {/* User info - only show on larger screens */}
-                <div className="hidden lg:flex items-center gap-1 px-2 py-1 rounded-lg border transition-all duration-300 max-w-24" style={{
+                <div className="hidden xl:flex items-center gap-1 px-2 py-1 rounded-lg border transition-all duration-300 max-w-24" style={{
                   backgroundColor: 'var(--color-surface)',
                   borderColor: 'var(--color-border)'
                 }}>
@@ -118,7 +123,7 @@ export function Header({
 
         {/* Mobile left actions - shown below header on small screens */}
         {leftActions && (
-          <div className="sm:hidden pb-3 border-t" style={{ borderColor: 'var(--color-border)' }}>
+          <div className="lg:hidden pb-3 border-t" style={{ borderColor: 'var(--color-border)' }}>
             <div className="flex items-center justify-center pt-3">
               {leftActions}
             </div>

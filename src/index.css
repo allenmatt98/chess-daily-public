@@ -101,20 +101,20 @@
   }
 
   .progress-cell {
-    @apply w-6 h-6 rounded border flex items-center justify-center text-sm font-medium transition-all duration-200;
-    border-color: var(--color-border);
+    @apply w-6 h-6 rounded flex items-center justify-center text-sm font-medium transition-all duration-200;
+    background-color: var(--color-surface);
   }
 
   .progress-cell.correct {
-    @apply bg-green-500 border-green-500 text-white;
+    @apply bg-green-500 text-white;
   }
 
   .progress-cell.partial {
-    @apply bg-yellow-500 border-yellow-500 text-white;
+    @apply bg-yellow-500 text-white;
   }
 
   .progress-cell.wrong {
-    @apply bg-red-500 border-red-500 text-white;
+    @apply bg-red-500 text-white;
   }
 
   .progress-cell.hint {
