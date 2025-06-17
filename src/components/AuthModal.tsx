@@ -84,11 +84,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const showPasswordRequirements = (mode === 'signup' || mode === 'reset') && password.length > 0;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4 relative animate-[scale-up_0.2s_ease-out]">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="card w-full max-w-md mx-4 p-6 relative animate-scale-up">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+          className="absolute right-4 top-4 transition-colors duration-200"
+          style={{ color: 'var(--color-text-muted)' }}
+          onMouseEnter={(e) => e.target.style.color = 'var(--color-text)'}
+          onMouseLeave={(e) => e.target.style.color = 'var(--color-text-muted)'}
         >
           <X className="w-5 h-5" />
         </button>
@@ -100,14 +103,17 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               setError('');
               setSuccess('');
             }}
-            className="absolute left-4 top-4 text-gray-400 hover:text-gray-600 flex items-center gap-1"
+            className="absolute left-4 top-4 flex items-center gap-1 transition-colors duration-200"
+            style={{ color: 'var(--color-text-muted)' }}
+            onMouseEnter={(e) => e.target.style.color = 'var(--color-text)'}
+            onMouseLeave={(e) => e.target.style.color = 'var(--color-text-muted)'}
           >
             <ArrowLeft className="w-4 h-4" />
             Back
           </button>
         )}
 
-        <h2 className="text-2xl font-bold mb-6">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--color-text)' }}>
           {mode === 'signin' && 'Sign In'}
           {mode === 'signup' && 'Create Account'}
           {mode === 'forgot' && 'Reset Password'}
@@ -115,12 +121,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         </h2>
 
         {confirmationSent ? (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+          <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4 mb-4">
             <div className="flex items-start gap-3">
-              <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-medium text-green-800">Check your email</h3>
-                <p className="text-sm text-green-700 mt-1">
+                <h3 className="font-medium text-green-400">Check your email</h3>
+                <p className="text-sm text-green-300 mt-1">
                   We've sent a confirmation link to {email}. Please check your email and click the link to activate your account.
                 </p>
               </div>
@@ -130,7 +136,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode !== 'reset' && (
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="email" className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>
                   Email
                 </label>
                 <input
@@ -138,7 +144,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                  className="w-full px-3 py-2 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  style={{
+                    backgroundColor: 'var(--color-surface)',
+                    borderColor: 'var(--color-border)',
+                    color: 'var(--color-text)'
+                  }}
                   required
                 />
               </div>
@@ -146,7 +157,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
             {(mode === 'signin' || mode === 'signup' || mode === 'reset') && (
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="password" className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>
                   {mode === 'reset' ? 'New Password' : 'Password'}
                 </label>
                 <input
@@ -154,7 +165,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                  className="w-full px-3 py-2 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  style={{
+                    backgroundColor: 'var(--color-surface)',
+                    borderColor: 'var(--color-border)',
+                    color: 'var(--color-text)'
+                  }}
                   required
                 />
               </div>
@@ -162,7 +178,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
             {mode === 'reset' && (
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>
                   Confirm New Password
                 </label>
                 <input
@@ -170,7 +186,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   id="confirmPassword"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                  className="w-full px-3 py-2 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  style={{
+                    backgroundColor: 'var(--color-surface)',
+                    borderColor: 'var(--color-border)',
+                    color: 'var(--color-text)'
+                  }}
                   required
                 />
               </div>
@@ -178,13 +199,13 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
             {showPasswordRequirements && (
               <div className="text-sm space-y-1">
-                <p className="font-medium text-gray-700">Password requirements:</p>
+                <p className="font-medium" style={{ color: 'var(--color-text)' }}>Password requirements:</p>
                 <ul className="space-y-1">
                   {passwordRequirements.map((req, index) => (
                     <li
                       key={index}
                       className={`flex items-center gap-2 ${
-                        req.met ? 'text-green-600' : 'text-gray-500'
+                        req.met ? 'text-green-400' : 'text-gray-500'
                       }`}
                     >
                       <span className="w-4 h-4">
@@ -198,22 +219,22 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             )}
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
-                <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-600">{error}</p>
+              <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-3 flex items-start gap-2">
+                <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-300">{error}</p>
               </div>
             )}
 
             {success && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-green-600">{success}</p>
+              <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-3 flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-green-300">{success}</p>
               </div>
             )}
 
             <button
               type="submit"
-              className="w-full bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-primary-90 transition-colors"
+              className="w-full btn-primary py-3"
             >
               {mode === 'signin' && 'Sign In'}
               {mode === 'signup' && 'Create Account'}
@@ -223,7 +244,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
             {mode === 'signin' && (
               <div className="space-y-2 text-sm text-center">
-                <p>
+                <p style={{ color: 'var(--color-text)' }}>
                   Don't have an account?{' '}
                   <button
                     type="button"
@@ -231,7 +252,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       setMode('signup');
                       setError('');
                     }}
-                    className="text-primary hover:underline"
+                    className="text-green-400 hover:text-green-300 transition-colors"
                   >
                     Sign Up
                   </button>
@@ -243,7 +264,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       setMode('forgot');
                       setError('');
                     }}
-                    className="text-primary hover:underline"
+                    className="text-green-400 hover:text-green-300 transition-colors"
                   >
                     Forgot Password?
                   </button>

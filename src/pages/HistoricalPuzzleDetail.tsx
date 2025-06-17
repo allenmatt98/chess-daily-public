@@ -7,6 +7,8 @@ import { updateHistoricalPuzzleProgress } from '../lib/puzzleService';
 import { useAuthStore } from '../store/authStore';
 import { Footer } from '../components/Footer';
 import { Header } from '../components/Header';
+import { useTheme } from '../hooks/useTheme';
+import { ArrowLeft } from 'lucide-react';
 import type { ChessPuzzle as ChessPuzzleType } from '../types';
 
 export default function HistoricalPuzzleDetail() {
@@ -15,6 +17,7 @@ export default function HistoricalPuzzleDetail() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     if (!id) return;
@@ -37,8 +40,24 @@ export default function HistoricalPuzzleDetail() {
     })();
   }, [id]);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col transition-colors duration-300" style={{ backgroundColor: 'var(--color-background)' }}>
+        <Header
+          onHowToPlay={() => navigate('/how-to-play')}
+          onSignIn={() => navigate('/auth/callback')}
+          onSignOut={() => { useAuthStore.getState().signOut(); navigate('/'); }}
+          onLogoClick={() => navigate('/')}
+        />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex flex-col bg-[--color-background]">
+    <div className="min-h-screen flex flex-col transition-colors duration-300" style={{ backgroundColor: 'var(--color-background)' }}>
       <Header
         onHowToPlay={() => navigate('/how-to-play')}
         onSignIn={() => navigate('/auth/callback')}
@@ -46,37 +65,43 @@ export default function HistoricalPuzzleDetail() {
         onLogoClick={() => navigate('/')}
         leftActions={
           <button
-            className="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 transition"
+            className="btn-primary text-sm"
             onClick={() => navigate('/')}
           >
-            Go to Current Puzzle
+            Current Puzzle
           </button>
         }
       />
-      <main className="flex-1 flex flex-col items-center justify-center px-4">
-        <div className="w-full max-w-3xl">
-          {loading ? (
-            <div className="p-4">Loading puzzle...</div>
-          ) : !puzzle ? (
-            <div className="p-4">Puzzle not found.</div>
+      <main className="flex-1">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <button 
+            className="inline-flex items-center mb-6 transition-colors duration-200 hover:text-green-400"
+            style={{ color: 'var(--color-text-muted)' }}
+            onClick={() => navigate('/historical-puzzles')}
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back to all puzzles
+          </button>
+
+          {!puzzle ? (
+            <div className="card p-8 text-center">
+              <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>Puzzle not found</h2>
+              <p style={{ color: 'var(--color-text-muted)' }}>
+                The puzzle you're looking for doesn't exist or has been removed.
+              </p>
+            </div>
           ) : (
-            <>
-              <button className="mb-4 text-blue-600 underline" onClick={() => navigate('/historical-puzzles')}>
-                ← Back to all puzzles
-              </button>
-              <h2 className="text-xl font-bold mb-2">Puzzle #{puzzle.absolute_number}</h2>
-              <ChessPuzzle
-                puzzle={puzzle}
-                onComplete={async (timeTaken, hintsUsed) => {
-                  if (!user) return null; // For guests, do not save progress
-                  return updateHistoricalPuzzleProgress(user.id, puzzle.id, timeTaken, hintsUsed);
-                }}
-              />
-            </>
+            <ChessPuzzle
+              puzzle={puzzle}
+              onComplete={async (timeTaken, hintsUsed) => {
+                if (!user) return null;
+                return updateHistoricalPuzzleProgress(user.id, puzzle.id, timeTaken, hintsUsed);
+              }}
+            />
           )}
         </div>
       </main>
       <Footer />
     </div>
   );
-} 
+}

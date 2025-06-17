@@ -5,19 +5,29 @@ import { useNavigate } from 'react-router-dom';
 import { Chessboard } from 'react-chessboard';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
+import { useTheme } from '../hooks/useTheme';
+import { CheckCircle, Clock, Trophy } from 'lucide-react';
 
-const miniBoard = (fen: string) => {
+const miniBoard = (fen: string, isDarkMode: boolean) => {
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center mb-3">
       <Chessboard
         position={fen}
         boardWidth={120}
         arePiecesDraggable={false}
         areArrowsAllowed={false}
         boardOrientation="white"
-        customBoardStyle={{ boxShadow: 'none', border: '1px solid #e5e7eb', borderRadius: 4 }}
-        customDarkSquareStyle={{ backgroundColor: '#b58863' }}
-        customLightSquareStyle={{ backgroundColor: '#f0d9b5' }}
+        customBoardStyle={{ 
+          boxShadow: 'none', 
+          borderRadius: '8px',
+          border: `1px solid ${isDarkMode ? '#334155' : '#e2e8f0'}`
+        }}
+        customDarkSquareStyle={{ 
+          backgroundColor: isDarkMode ? '#475569' : '#64748b'
+        }}
+        customLightSquareStyle={{ 
+          backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9'
+        }}
       />
     </div>
   );
@@ -28,6 +38,7 @@ export default function HistoricalPuzzles() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     setLoading(true);
@@ -36,7 +47,6 @@ export default function HistoricalPuzzles() {
         .then(setPuzzles)
         .finally(() => setLoading(false));
     } else {
-      // For guests, fetch all puzzles and mark as unsolved
       import('../lib/supabase').then(({ supabase }) => {
         supabase
           .from('puzzles')
@@ -55,11 +65,23 @@ export default function HistoricalPuzzles() {
   }, [user]);
 
   if (loading) {
-    return <div className="p-4">Loading puzzles...</div>;
+    return (
+      <div className="min-h-screen flex flex-col transition-colors duration-300" style={{ backgroundColor: 'var(--color-background)' }}>
+        <Header
+          onHowToPlay={() => navigate('/how-to-play')}
+          onSignIn={() => navigate('/auth/callback')}
+          onSignOut={() => { useAuthStore.getState().signOut(); navigate('/'); }}
+          onLogoClick={() => navigate('/')}
+        />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[--color-background]">
+    <div className="min-h-screen flex flex-col transition-colors duration-300" style={{ backgroundColor: 'var(--color-background)' }}>
       <Header
         onHowToPlay={() => navigate('/how-to-play')}
         onSignIn={() => navigate('/auth/callback')}
@@ -67,36 +89,77 @@ export default function HistoricalPuzzles() {
         onLogoClick={() => navigate('/')}
         leftActions={
           <button
-            className="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 transition"
+            className="btn-primary text-sm"
             onClick={() => navigate('/')}
           >
-            Go to Current Puzzle
+            Current Puzzle
           </button>
         }
       />
       <main className="flex-1 p-4 max-w-6xl mx-auto w-full">
-        <h1 className="text-2xl font-bold mb-4">Historical Puzzles</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>Puzzle Archives</h1>
+          <p style={{ color: 'var(--color-text-muted)' }}>
+            Practice with previous daily puzzles and track your progress
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {puzzles.map((puzzle) => (
             <div
               key={puzzle.id}
-              className={`border rounded p-3 cursor-pointer hover:shadow transition ${puzzle.solved ? 'bg-green-50' : 'bg-white'}`}
+              className={`card p-4 cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105 ${
+                puzzle.solved ? 'ring-2 ring-green-500/30' : ''
+              }`}
               onClick={() => navigate(`/historical-puzzle/${puzzle.id}`)}
             >
-              {miniBoard(puzzle.fen)}
-              <div className="mt-2 text-sm">
-                <div className="font-semibold">Puzzle #{puzzle.absolute_number}</div>
-                <div>Difficulty: {puzzle.difficulty}</div>
-                <div>Status: {puzzle.solved ? 'Solved' : 'Unsolved'}</div>
-                {puzzle.solved && puzzle.bestTime && (
-                  <div>Best time: {puzzle.bestTime}s</div>
-                )}
+              {miniBoard(puzzle.fen, isDarkMode)}
+              
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold" style={{ color: 'var(--color-text)' }}>
+                    Puzzle #{puzzle.absolute_number}
+                  </h3>
+                  {puzzle.solved && (
+                    <CheckCircle className="w-5 h-5 text-green-400" />
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                  <Trophy className="w-4 h-4" />
+                  <span>Difficulty: {puzzle.difficulty}/5</span>
+                </div>
+                
+                <div className="flex items-center justify-between text-sm">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    puzzle.solved 
+                      ? 'bg-green-500/20 text-green-400' 
+                      : 'bg-gray-500/20 text-gray-400'
+                  }`}>
+                    {puzzle.solved ? 'Solved' : 'Unsolved'}
+                  </span>
+                  
+                  {puzzle.solved && puzzle.bestTime && (
+                    <div className="flex items-center gap-1" style={{ color: 'var(--color-text-muted)' }}>
+                      <Clock className="w-3 h-3" />
+                      <span>{Math.floor(puzzle.bestTime / 60)}:{(puzzle.bestTime % 60).toString().padStart(2, '0')}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}
         </div>
+
+        {puzzles.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-lg" style={{ color: 'var(--color-text-muted)' }}>
+              No puzzles available yet. Check back later!
+            </p>
+          </div>
+        )}
       </main>
       <Footer />
     </div>
   );
-} 
+}
