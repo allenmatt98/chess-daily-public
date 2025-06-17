@@ -98,28 +98,41 @@
 
   .progress-grid {
     @apply grid gap-1;
+    max-width: 100%;
+    overflow-x: auto;
   }
 
   .progress-cell {
     @apply w-6 h-6 rounded flex items-center justify-center text-sm font-medium transition-all duration-200;
     background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    min-width: 24px;
+    flex-shrink: 0;
   }
 
+  /* Clean progress cell styles without thick borders */
   .progress-cell.correct {
-    @apply bg-green-500 text-white;
+    background-color: #22c55e;
+    color: white;
+    border: 1px solid #22c55e;
   }
 
   .progress-cell.partial {
-    @apply bg-yellow-500 text-white;
+    background-color: #eab308;
+    color: white;
+    border: 1px solid #eab308;
   }
 
   .progress-cell.wrong {
-    @apply bg-red-500 text-white;
+    background-color: #ef4444;
+    color: white;
+    border: 1px solid #ef4444;
   }
 
   .progress-cell.hint {
     background-color: var(--color-border);
     color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
   }
 
   .brand-text {
@@ -320,6 +333,7 @@
 
   .progress-cell {
     @apply w-4 h-4 text-xs;
+    min-width: 16px;
   }
 
   .stat-value {
@@ -336,6 +350,7 @@
   .progress-cell {
     @apply w-3 h-3;
     font-size: 0.6rem;
+    min-width: 12px;
   }
 
   .btn {
@@ -388,5 +403,6 @@ html, body {
     width: 0.75rem;
     height: 0.75rem;
     font-size: 0.5rem;
+    min-width: 12px;
   }
 }

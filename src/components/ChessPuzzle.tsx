@@ -548,7 +548,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       hint: '🏳️',
     };
     const userMoveIndexes = Array.from({ length: Math.ceil((puzzle.moves || []).length / 2) }, (_, i) => i * 2);
-    const cappedHistory = userMoveIndexes.map(idx => attemptHistory[idx]?.slice(-5) || []);
+    const cappedHistory = userMoveIndexes.map(idx => attemptHistory[idx] || []);
     const numCols = cappedHistory.length;
     const maxRows = Math.max(...cappedHistory.map(col => col.length), 1);
     const gridRows: string[] = [];
@@ -591,22 +591,17 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       [ATTEMPT_CLASS.CORRECT]: '🟩',
       hint: '🏳️',
     };
-    const bgMap = {
-      [ATTEMPT_CLASS.WRONG]: 'wrong',
-      [ATTEMPT_CLASS.RIGHT_PIECE]: 'partial',
-      [ATTEMPT_CLASS.CORRECT]: 'correct',
-      hint: 'hint',
-    };
+    
     const userMoveIndexes = Array.from({ length: Math.ceil((puzzle.moves || []).length / 2) }, (_, i) => i * 2);
-    const cappedHistory = userMoveIndexes.map(idx => attemptHistory[idx]?.slice(-5) || []);
+    const cappedHistory = userMoveIndexes.map(idx => attemptHistory[idx] || []);
     const numUserMoves = userMoveIndexes.length;
     const maxRows = Math.max(...cappedHistory.map(col => col.length), 1);
     
     return (
       <div className="flex flex-col items-center w-full">
-        <div className="progress-grid" style={{ gridTemplateColumns: `repeat(${numUserMoves}, 1fr)` }}>
+        <div className="progress-grid overflow-x-auto max-w-full" style={{ gridTemplateColumns: `repeat(${numUserMoves}, 1fr)` }}>
           {Array.from({ length: numUserMoves }).map((_, colIdx) => (
-            <div key={colIdx} className="flex flex-col gap-1">
+            <div key={colIdx} className="flex flex-col gap-1 min-w-0">
               {Array.from({ length: maxRows }).map((_, rowIdx) => {
                 const attempt = cappedHistory[colIdx]?.[rowIdx];
                 let emoji = '';
@@ -617,7 +612,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
                     className += ' hint';
                   } else {
                     emoji = emojiMap[attempt.classification];
-                    className += ` ${bgMap[attempt.classification]}`;
+                    className += ` ${attempt.classification}`;
                   }
                 }
                 return (
@@ -744,7 +739,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
                 <h3 className="text-base font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
               </div>
               
-              <div className="rounded-lg p-4 min-h-[120px] flex items-center justify-center border" style={{ 
+              <div className="rounded-lg p-4 min-h-[120px] flex items-center justify-center border overflow-x-auto" style={{ 
                 backgroundColor: 'var(--color-surface)',
                 borderColor: 'var(--color-border)'
               }}>
