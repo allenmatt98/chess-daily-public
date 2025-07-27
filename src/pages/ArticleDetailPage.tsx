@@ -5,117 +5,8 @@ import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { useTheme } from '../hooks/useTheme';
 import { useAuthStore } from '../store/authStore';
+import { getArticleBySlug, Article } from '../lib/articlesService';
 
-interface ArticleContent {
-  id: string;
-  title: string;
-  content: string;
-  thumbnail: string;
-  readTime: string;
-  category: string;
-  publishedAt: string;
-  slug: string;
-  tags: string[];
-  author: {
-    name: string;
-    bio: string;
-    avatar: string;
-  };
-  relatedArticles: string[];
-}
-
-// Sample article content - in production, this would come from your CMS/API
-const articleContent: Record<string, ArticleContent> = {
-  'immortal-game-anderssen-sacrifices': {
-    id: '1',
-    title: 'The Immortal Game: When Anderssen Sacrificed Everything',
-    content: `
-      <p>In the annals of chess history, few games shine as brightly as the "Immortal Game" played between Adolf Anderssen and Lionel Kieseritzky in London, 1851. This masterpiece of romantic chess demonstrates the beauty of sacrificial play and tactical brilliance that defined the era.</p>
-
-      <h2>The Setting</h2>
-      <p>The game was played during a break in the first international chess tournament. Anderssen, representing Germany, faced the French master Kieseritzky in what was meant to be a casual encounter. Neither player could have imagined they were about to create chess immortality.</p>
-
-      <h2>The Sacrificial Storm</h2>
-      <p>What makes this game truly immortal is Anderssen's willingness to sacrifice material for the sake of attack. In the span of just a few moves, he sacrificed:</p>
-      <ul>
-        <li>A bishop on move 11</li>
-        <li>Both rooks</li>
-        <li>His queen on the final move</li>
-      </ul>
-
-      <p>Each sacrifice was calculated to maintain the initiative and drive his opponent's king into an inescapable mating net.</p>
-
-      <h2>The Final Position</h2>
-      <p>The game concluded with one of the most beautiful checkmate patterns ever recorded. Anderssen's remaining pieces - just two bishops and a knight - delivered mate against Kieseritzky's materially superior but poorly coordinated army.</p>
-
-      <blockquote>
-        "This game represents the pinnacle of romantic chess, where beauty and brilliance mattered more than material advantage." - Garry Kasparov
-      </blockquote>
-
-      <h2>Legacy and Impact</h2>
-      <p>The Immortal Game has inspired countless chess players and continues to be studied today. It demonstrates that in chess, as in art, sometimes the most beautiful creations come from bold sacrifices and unwavering commitment to one's vision.</p>
-
-      <p>Modern chess engines confirm that while some of Anderssen's moves weren't the most accurate by today's standards, the game remains a testament to human creativity and the power of tactical vision.</p>
-    `,
-    thumbnail: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=800&h=400&fit=crop&crop=center',
-    readTime: '5 min read',
-    category: 'Classic Games',
-    publishedAt: '2024-01-15',
-    slug: 'immortal-game-anderssen-sacrifices',
-    tags: ['sacrifice', 'romantic era', 'masterpiece', 'anderssen', 'tactics'],
-    author: {
-      name: 'Dr. Elena Marchetti',
-      bio: 'Chess historian and International Master with a PhD in Medieval Studies. Author of "The Romantic Era of Chess" and curator of chess artifacts at the World Chess Museum.',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face'
-    },
-    relatedArticles: ['chess-medieval-courts-power-moves', 'psychology-blunders-masters-mistakes']
-  },
-  'chess-medieval-courts-power-moves': {
-    id: '2',
-    title: 'Chess in Medieval Courts: Power Moves Beyond the Board',
-    content: `
-      <p>Long before chess became the global phenomenon we know today, it served as more than just a game in the royal courts of medieval Europe. It was a symbol of power, a tool of diplomacy, and a reflection of the social hierarchy that defined the age.</p>
-
-      <h2>The Royal Game</h2>
-      <p>Chess arrived in Europe through the Islamic world around the 10th century, but it was in the medieval courts where it truly flourished. Kings and nobles didn't just play chess; they used it to demonstrate their strategic thinking and intellectual prowess.</p>
-
-      <h2>Symbolism and Society</h2>
-      <p>The chess pieces themselves reflected medieval society:</p>
-      <ul>
-        <li>The King represented the monarch</li>
-        <li>The Queen (originally the advisor or vizier) symbolized the power behind the throne</li>
-        <li>Bishops represented the church's influence</li>
-        <li>Knights embodied the military nobility</li>
-        <li>Rooks symbolized the fortified castles</li>
-        <li>Pawns represented the common people</li>
-      </ul>
-
-      <h2>Political Chess</h2>
-      <p>Historical records show that chess games between nobles often carried political weight. A well-played game could enhance one's reputation, while a poor showing might damage political standing. Some treaties were even negotiated over the chessboard.</p>
-
-      <blockquote>
-        "Chess is the gymnasium of the mind." - Blaise Pascal
-      </blockquote>
-
-      <h2>The Evolution of Rules</h2>
-      <p>Medieval chess differed significantly from the modern game. The queen was much weaker, bishops moved only two squares diagonally, and castling didn't exist. These changes evolved gradually, often influenced by the political and social changes of the time.</p>
-
-      <p>The transformation of the queen from a weak advisor to the most powerful piece on the board coincided with the rise of powerful female rulers like Isabella of Castile and Elizabeth I of England.</p>
-    `,
-    thumbnail: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=800&h=400&fit=crop&crop=center',
-    readTime: '7 min read',
-    category: 'History',
-    publishedAt: '2024-01-12',
-    slug: 'chess-medieval-courts-power-moves',
-    tags: ['medieval', 'royalty', 'culture', 'history', 'symbolism'],
-    author: {
-      name: 'Prof. Marcus Thornfield',
-      bio: 'Medieval historian specializing in court culture and games. Professor at Oxford University and author of "Games of Power: Entertainment in Medieval Courts."',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'
-    },
-    relatedArticles: ['immortal-game-anderssen-sacrifices', 'chess-cafes-vienna-legends-born']
-  }
-};
 
 export default function ArticleDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -123,17 +14,29 @@ export default function ArticleDetailPage() {
   const { isDarkMode } = useTheme();
   const { user } = useAuthStore();
   
-  const [article, setArticle] = useState<ArticleContent | null>(null);
+  const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (slug && articleContent[slug]) {
-      setArticle(articleContent[slug]);
-    } else {
-      // In production, you would fetch from your API here
-      setArticle(null);
+    async function loadArticle() {
+      if (!slug) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const articleData = await getArticleBySlug(slug);
+        setArticle(articleData);
+      } catch (error) {
+        console.error('Error loading article:', error);
+        setArticle(null);
+      } finally {
+        setLoading(false);
+      }
     }
-    setLoading(false);
+
+    loadArticle();
   }, [slug]);
 
   const handleShare = async () => {
@@ -141,7 +44,7 @@ export default function ArticleDetailPage() {
       try {
         await navigator.share({
           title: article.title,
-          text: article.content.substring(0, 160) + '...',
+          text: article.excerpt,
           url: window.location.href,
         });
       } catch (error) {
@@ -220,7 +123,7 @@ export default function ArticleDetailPage() {
         {/* Hero Section */}
         <div className="relative h-64 sm:h-80 lg:h-96 overflow-hidden">
           <img
-            src={article.thumbnail}
+            src={article.thumbnail_url}
             alt={article.title}
             className="w-full h-full object-cover"
           />
@@ -258,16 +161,19 @@ export default function ArticleDetailPage() {
           {/* Article Meta */}
           <div className="absolute bottom-6 left-6 right-6">
             <div className="flex flex-wrap items-center gap-2 mb-4 text-sm text-white/80">
-              <span className="px-2 py-1 rounded-full bg-green-500 text-white font-medium">
-                {article.category}
+              <span 
+                className="px-2 py-1 rounded-full text-white font-medium"
+                style={{ backgroundColor: article.category_color }}
+              >
+                {article.category_name}
               </span>
               <div className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
-                {article.readTime}
+                {article.read_time_minutes} min read
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                {formatDate(article.publishedAt)}
+                {formatDate(article.published_at)}
               </div>
             </div>
             
@@ -315,7 +221,7 @@ export default function ArticleDetailPage() {
                   '--tw-prose-quote-borders': '#22c55e',
                   '--tw-prose-code': 'var(--color-text)',
                 }}
-                dangerouslySetInnerHTML={{ __html: article.content }}
+                dangerouslySetInnerHTML={{ __html: article.content || article.excerpt }}
               />
 
               {/* Tags */}
@@ -344,16 +250,16 @@ export default function ArticleDetailPage() {
               <div className="mt-8 pt-8 border-t" style={{ borderColor: 'var(--color-border)' }}>
                 <div className="flex items-start gap-4">
                   <img
-                    src={article.author.avatar}
-                    alt={article.author.name}
+                    src={article.author_avatar_url}
+                    alt={article.author_name}
                     className="w-16 h-16 rounded-full object-cover"
                   />
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
-                      {article.author.name}
+                      {article.author_name}
                     </h3>
                     <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                      {article.author.bio}
+                      {article.author_bio}
                     </p>
                   </div>
                 </div>
@@ -400,11 +306,11 @@ export default function ArticleDetailPage() {
                 <div className="space-y-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4" />
-                    {article.readTime}
+                    {article.read_time_minutes} min read
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
-                    {formatDate(article.publishedAt)}
+                    {formatDate(article.published_at)}
                   </div>
                   <div className="flex items-center gap-2">
                     <Tag className="w-4 h-4" />

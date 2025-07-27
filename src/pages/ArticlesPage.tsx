@@ -5,130 +5,50 @@ import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { useTheme } from '../hooks/useTheme';
 import { useAuthStore } from '../store/authStore';
+import { getArticles, getArticleCategories, Article, ArticleCategory } from '../lib/articlesService';
 
-interface Article {
-  id: string;
-  title: string;
-  teaser: string;
-  thumbnail: string;
-  readTime: string;
-  category: string;
-  publishedAt: string;
-  slug: string;
-  tags: string[];
-}
-
-// Extended articles data for the full listing
-const allArticles: Article[] = [
-  {
-    id: '1',
-    title: 'The Immortal Game: When Anderssen Sacrificed Everything',
-    teaser: 'Discover how Adolf Anderssen created chess history with the most beautiful sacrificial attack ever played in 1851.',
-    thumbnail: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=400&h=250&fit=crop&crop=center',
-    readTime: '5 min read',
-    category: 'Classic Games',
-    publishedAt: '2024-01-15',
-    slug: 'immortal-game-anderssen-sacrifices',
-    tags: ['sacrifice', 'romantic era', 'masterpiece']
-  },
-  {
-    id: '2',
-    title: 'Chess in Medieval Courts: Power Moves Beyond the Board',
-    teaser: 'How chess became the ultimate symbol of strategy and intellect in royal courts across Europe during the Middle Ages.',
-    thumbnail: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=250&fit=crop&crop=center',
-    readTime: '7 min read',
-    category: 'History',
-    publishedAt: '2024-01-12',
-    slug: 'chess-medieval-courts-power-moves',
-    tags: ['medieval', 'royalty', 'culture']
-  },
-  {
-    id: '3',
-    title: 'The Psychology of Blunders: Why Masters Make Mistakes',
-    teaser: 'Exploring the mental factors that lead even world champions to make shocking errors in critical moments.',
-    thumbnail: 'https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=400&h=250&fit=crop&crop=center',
-    readTime: '6 min read',
-    category: 'Psychology',
-    publishedAt: '2024-01-10',
-    slug: 'psychology-blunders-masters-mistakes',
-    tags: ['psychology', 'blunders', 'mental game']
-  },
-  {
-    id: '4',
-    title: 'Secret Chess Codes: How Players Communicated in Tournaments',
-    teaser: 'The fascinating world of hidden signals and communication methods used by chess players in competitive tournaments.',
-    thumbnail: 'https://images.unsplash.com/photo-1528819622765-d6bcf132f793?w=400&h=250&fit=crop&crop=center',
-    readTime: '4 min read',
-    category: 'Secrets',
-    publishedAt: '2024-01-08',
-    slug: 'secret-chess-codes-tournament-communication',
-    tags: ['secrets', 'tournaments', 'communication']
-  },
-  {
-    id: '5',
-    title: 'The Lost Art of Chess Composition: Creating Perfect Puzzles',
-    teaser: 'Meet the artists who craft the most elegant and challenging chess problems, and learn about their creative process.',
-    thumbnail: 'https://images.unsplash.com/photo-1611195974226-ef16ab4e4c8d?w=400&h=250&fit=crop&crop=center',
-    readTime: '8 min read',
-    category: 'Art',
-    publishedAt: '2024-01-05',
-    slug: 'lost-art-chess-composition-perfect-puzzles',
-    tags: ['composition', 'puzzles', 'art']
-  },
-  {
-    id: '6',
-    title: 'Chess Cafés of Vienna: Where Legends Were Born',
-    teaser: 'Step into the smoky cafés where chess masters gathered to play, discuss theory, and create chess history.',
-    thumbnail: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400&h=250&fit=crop&crop=center',
-    readTime: '6 min read',
-    category: 'Culture',
-    publishedAt: '2024-01-03',
-    slug: 'chess-cafes-vienna-legends-born',
-    tags: ['vienna', 'cafes', 'culture']
-  },
-  {
-    id: '7',
-    title: 'The Great Chess Automaton Hoax: The Mechanical Turk',
-    teaser: 'Uncover the truth behind the 18th century chess-playing machine that fooled emperors and intellectuals.',
-    thumbnail: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=250&fit=crop&crop=center',
-    readTime: '9 min read',
-    category: 'Mysteries',
-    publishedAt: '2024-01-01',
-    slug: 'mechanical-turk-chess-automaton-hoax',
-    tags: ['automaton', 'hoax', 'history']
-  },
-  {
-    id: '8',
-    title: 'Women Warriors of Chess: Forgotten Female Masters',
-    teaser: 'Celebrating the pioneering women who broke barriers and excelled in the male-dominated world of competitive chess.',
-    thumbnail: 'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=250&fit=crop&crop=center',
-    readTime: '10 min read',
-    category: 'Pioneers',
-    publishedAt: '2023-12-28',
-    slug: 'women-warriors-chess-forgotten-masters',
-    tags: ['women', 'pioneers', 'equality']
-  }
-];
-
-const categories = ['All', 'Classic Games', 'History', 'Psychology', 'Secrets', 'Art', 'Culture', 'Mysteries', 'Pioneers'];
 
 export default function ArticlesPage() {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
   const { user } = useAuthStore();
   
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [categories, setCategories] = useState<ArticleCategory[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'readTime'>('newest');
+
+  // Load articles and categories on component mount
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        const [articlesData, categoriesData] = await Promise.all([
+          getArticles({ limit: 50 }),
+          getArticleCategories()
+        ]);
+        setArticles(articlesData);
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Error loading articles data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
 
   // Filter and sort articles
   const filteredAndSortedArticles = useMemo(() => {
-    let filtered = allArticles.filter(article => {
+    let filtered = articles.filter(article => {
       const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           article.teaser.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           article.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            article.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
       
-      const matchesCategory = selectedCategory === 'All' || article.category === selectedCategory;
+      const matchesCategory = !selectedCategory || article.category_slug === selectedCategory;
       
       return matchesSearch && matchesCategory;
     });
@@ -137,18 +57,18 @@ export default function ArticlesPage() {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'newest':
-          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+          return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
         case 'oldest':
-          return new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime();
+          return new Date(a.published_at).getTime() - new Date(b.published_at).getTime();
         case 'readTime':
-          return parseInt(a.readTime) - parseInt(b.readTime);
+          return a.read_time_minutes - b.read_time_minutes;
         default:
           return 0;
       }
     });
 
     return filtered;
-  }, [searchTerm, selectedCategory, sortBy]);
+  }, [articles, searchTerm, selectedCategory, sortBy]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -157,6 +77,22 @@ export default function ArticlesPage() {
       day: 'numeric'
     });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col transition-colors duration-300" style={{ backgroundColor: 'var(--color-background)' }}>
+        <Header
+          onHowToPlay={() => {}}
+          onSignIn={() => {}}
+          onSignOut={() => { useAuthStore.getState().signOut(); }}
+          onLogoClick={() => navigate('/')}
+        />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col transition-colors duration-300" style={{ backgroundColor: 'var(--color-background)' }}>
@@ -239,8 +175,9 @@ export default function ArticlesPage() {
                   color: 'var(--color-text)'
                 }}
               >
+                <option value="">All Categories</option>
                 {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
+                  <option key={category.slug} value={category.slug}>{category.name}</option>
                 ))}
               </select>
             </div>
@@ -269,9 +206,9 @@ export default function ArticlesPage() {
         {/* Results Count */}
         <div className="mb-6">
           <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            Showing {filteredAndSortedArticles.length} of {allArticles.length} articles
+            Showing {filteredAndSortedArticles.length} of {articles.length} articles
             {searchTerm && ` for "${searchTerm}"`}
-            {selectedCategory !== 'All' && ` in ${selectedCategory}`}
+            {selectedCategory && ` in ${categories.find(c => c.slug === selectedCategory)?.name}`}
           </p>
         </div>
 
@@ -287,16 +224,16 @@ export default function ArticlesPage() {
                 {/* Thumbnail */}
                 <div className="relative mb-4 overflow-hidden rounded-lg">
                   <img
-                    src={article.thumbnail}
+                    src={article.thumbnail_url}
                     alt={article.title}
                     className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
                     loading="lazy"
                   />
                   <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium bg-black/70 text-white">
-                    {article.readTime}
+                    {article.read_time_minutes} min read
                   </div>
                   <div className="absolute bottom-3 left-3 px-2 py-1 rounded-full text-xs font-medium bg-green-500 text-white">
-                    {article.category}
+                    {article.category_name}
                   </div>
                 </div>
 
@@ -307,7 +244,7 @@ export default function ArticlesPage() {
                   </h3>
                   
                   <p className="text-sm mb-4 flex-1 line-clamp-3" style={{ color: 'var(--color-text-muted)' }}>
-                    {article.teaser}
+                    {article.excerpt}
                   </p>
 
                   {/* Tags */}
@@ -329,7 +266,7 @@ export default function ArticlesPage() {
 
                   {/* Meta Info */}
                   <div className="flex items-center justify-between text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                    <span>{formatDate(article.publishedAt)}</span>
+                    <span>{formatDate(article.published_at)}</span>
                     <button className="btn-secondary text-xs px-3 py-1 group-hover:bg-green-500 group-hover:text-white transition-all duration-200">
                       Read More
                     </button>
@@ -353,7 +290,7 @@ export default function ArticlesPage() {
               <button
                 onClick={() => {
                   setSearchTerm('');
-                  setSelectedCategory('All');
+                  setSelectedCategory('');
                 }}
                 className="btn-primary"
               >
