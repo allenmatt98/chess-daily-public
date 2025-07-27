@@ -13,8 +13,6 @@ export function HiddenGemsSection({ className = '' }: HiddenGemsSectionProps) {
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [loading, setLoading] = useState(true);
   const carouselRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
