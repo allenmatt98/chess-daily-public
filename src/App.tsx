@@ -17,7 +17,6 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { Header } from './components/Header';
 import { useNavigate } from 'react-router-dom';
 import { HiddenGemsSection } from './components/HiddenGemsSection';
-import { HiddenGemsSection } from './components/HiddenGemsSection';
 
 type Puzzle = Database['public']['Tables']['puzzles']['Row'];
 

@@ -10,8 +10,6 @@ import HistoricalPuzzles from './pages/HistoricalPuzzles';
 import HistoricalPuzzleDetail from './pages/HistoricalPuzzleDetail';
 import ArticlesPage from './pages/ArticlesPage';
 import ArticleDetailPage from './pages/ArticleDetailPage';
-import ArticlesPage from './pages/ArticlesPage';
-import ArticleDetailPage from './pages/ArticleDetailPage';
 import './index.css';
 
 const router = createBrowserRouter([
