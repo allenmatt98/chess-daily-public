@@ -90,40 +90,6 @@ export function HiddenGemsSection({ className = '' }: HiddenGemsSectionProps) {
     );
   }
 
-  // Format date helper
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  if (loading) {
-    return (
-      <section className={`card p-4 sm:p-6 lg:p-8 ${className}`}>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-        </div>
-      </section>
-    );
-  }
-
-  if (articles.length === 0) {
-    return (
-      <section className={`card p-4 sm:p-6 lg:p-8 ${className}`}>
-        <div className="text-center py-12">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
-            Hidden Gems from the Chess World
-          </h2>
-          <p style={{ color: 'var(--color-text-muted)' }}>
-            No articles available at the moment. Check back soon!
-          </p>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section 
       className={`card p-4 sm:p-6 lg:p-8 ${className}`}
