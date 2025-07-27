@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getFeaturedArticles, Article } from '../lib/articlesService';
-import { getFeaturedArticles, Article } from '../lib/articlesService';
 
 
 interface HiddenGemsSectionProps {
