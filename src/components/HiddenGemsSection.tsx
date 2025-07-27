@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getFeaturedArticles, Article } from '../lib/articlesService';
+import { getFeaturedArticles, Article } from '../lib/articlesService';
 
 
 interface HiddenGemsSectionProps {
@@ -11,6 +12,8 @@ interface HiddenGemsSectionProps {
 export function HiddenGemsSection({ className = '' }: HiddenGemsSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -33,66 +36,62 @@ export function HiddenGemsSection({ className = '' }: HiddenGemsSectionProps) {
     loadFeaturedArticles();
   }, []);
 
-  // Auto-play functionality
+  // Load featured articles on component mount
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    async function loadFeaturedArticles() {
+      try {
+        setLoading(true);
+        const featuredArticles = await getFeaturedArticles(6);
+        setArticles(featuredArticles);
+      } catch (error) {
+        console.error('Error loading featured articles:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % Math.ceil(articles.length / 3));
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [isAutoPlaying, articles.length]);
-
-  // Pause auto-play on hover
-  const handleMouseEnter = () => setIsAutoPlaying(false);
-  const handleMouseLeave = () => setIsAutoPlaying(true);
-
-  // Navigation functions
-  const goToPrevious = () => {
-    setCurrentIndex((prev) => 
-      prev === 0 ? Math.ceil(articles.length / 3) - 1 : prev - 1
-    );
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % Math.ceil(articles.length / 3));
-  };
-
-  // Touch/swipe handling for mobile
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
-
-    if (isLeftSwipe) goToNext();
-    if (isRightSwipe) goToPrevious();
-  };
-
-  // Truncate text helper
-  const truncateText = (text: string, maxLength: number) => {
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-  };
+    loadFeaturedArticles();
+  }, []);
 
   // Get visible articles for current slide
   const getVisibleArticles = () => {
     const startIndex = currentIndex * 3;
     return articles.slice(startIndex, startIndex + 3);
   };
+
+  // Format date helper
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  if (loading) {
+    return (
+      <section className={`card p-4 sm:p-6 lg:p-8 ${className}`}>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        </div>
+      </section>
+    );
+  }
+
+  if (articles.length === 0) {
+    return (
+      <section className={`card p-4 sm:p-6 lg:p-8 ${className}`}>
+        <div className="text-center py-12">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
+            Hidden Gems from the Chess World
+          </h2>
+          <p style={{ color: 'var(--color-text-muted)' }}>
+            No articles available at the moment. Check back soon!
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   // Format date helper
   const formatDate = (dateString: string) => {
