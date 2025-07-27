@@ -6,7 +6,6 @@ import { Footer } from '../components/Footer';
 import { useTheme } from '../hooks/useTheme';
 import { useAuthStore } from '../store/authStore';
 import { getArticleBySlug, Article } from '../lib/articlesService';
-import { getArticleBySlug, Article } from '../lib/articlesService';
 
 
 export default function ArticleDetailPage() {
@@ -32,13 +31,22 @@ export default function ArticleDetailPage() {
       } catch (error) {
         console.error('Error loading article:', error);
         setArticle(null);
-    if (navigator.share && article) {
+      } finally {
         setLoading(false);
       }
-          title: article.title,
-          text: article.excerpt,
+    }
+    
     loadArticle();
   }, [slug]);
+
+  const handleShare = async () => {
+    if (navigator.share && article) {
+      try {
+        await navigator.share({
+          title: article.title,
+          text: article.excerpt,
+          url: window.location.href
+        });
       } catch (error) {
         // Fallback to copying URL to clipboard
         navigator.clipboard.writeText(window.location.href);
@@ -56,51 +64,6 @@ export default function ArticleDetailPage() {
       day: 'numeric'
     });
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col transition-colors duration-300" style={{ backgroundColor: 'var(--color-background)' }}>
-        <Header
-          onHowToPlay={() => {}}
-          onSignIn={() => {}}
-          onSignOut={() => { useAuthStore.getState().signOut(); }}
-          onLogoClick={() => navigate('/')}
-        />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!article) {
-    return (
-      <div className="min-h-screen flex flex-col transition-colors duration-300" style={{ backgroundColor: 'var(--color-background)' }}>
-        <Header
-          onHowToPlay={() => {}}
-          onSignIn={() => {}}
-          onSignOut={() => { useAuthStore.getState().signOut(); }}
-          onLogoClick={() => navigate('/')}
-        />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
-              Article Not Found
-            </h1>
-            <p className="mb-6" style={{ color: 'var(--color-text-muted)' }}>
-              The article you're looking for doesn't exist or has been moved.
-            </p>
-            <button
-              onClick={() => navigate('/articles')}
-              className="btn-primary"
-            >
-              Browse All Articles
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (loading) {
     return (
