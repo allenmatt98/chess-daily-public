@@ -10,6 +10,8 @@ import HistoricalPuzzles from './pages/HistoricalPuzzles';
 import HistoricalPuzzleDetail from './pages/HistoricalPuzzleDetail';
 import ArticlesPage from './pages/ArticlesPage';
 import ArticleDetailPage from './pages/ArticleDetailPage';
+import ArticlesPage from './pages/ArticlesPage';
+import ArticleDetailPage from './pages/ArticleDetailPage';
 import './index.css';
 
 const router = createBrowserRouter([
@@ -40,6 +42,14 @@ const router = createBrowserRouter([
   {
     path: '/historical-puzzle/:id',
     element: <HistoricalPuzzleDetail />,
+  },
+  {
+    path: '/articles',
+    element: <ArticlesPage />,
+  },
+  {
+    path: '/articles/:slug',
+    element: <ArticleDetailPage />,
   },
   {
     path: '/articles',
