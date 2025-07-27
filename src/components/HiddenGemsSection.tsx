@@ -33,22 +33,60 @@ export function HiddenGemsSection({ className = '' }: HiddenGemsSectionProps) {
     loadFeaturedArticles();
   }, []);
 
-  // Load featured articles on component mount
+  // Auto-play functionality
   useEffect(() => {
-    async function loadFeaturedArticles() {
-      try {
-        setLoading(true);
-        const featuredArticles = await getFeaturedArticles(6);
-        setArticles(featuredArticles);
-      } catch (error) {
-        console.error('Error loading featured articles:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
+    if (!isAutoPlaying) return;
 
-    loadFeaturedArticles();
-  }, []);
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % Math.ceil(articles.length / 3));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, articles.length]);
+
+  // Pause auto-play on hover
+  const handleMouseEnter = () => setIsAutoPlaying(false);
+  const handleMouseLeave = () => setIsAutoPlaying(true);
+
+  // Navigation functions
+  const goToPrevious = () => {
+    setCurrentIndex((prev) => 
+      prev === 0 ? Math.ceil(articles.length / 3) - 1 : prev - 1
+    );
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % Math.ceil(articles.length / 3));
+  };
+
+  // Touch/swipe handling for mobile
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) goToNext();
+    if (isRightSwipe) goToPrevious();
+  };
+
+  // Truncate text helper
+  const truncateText = (text: string, maxLength: number) => {
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
 
   // Get visible articles for current slide
   const getVisibleArticles = () => {

@@ -49,14 +49,6 @@ const router = createBrowserRouter([
     path: '/articles/:slug',
     element: <ArticleDetailPage />,
   },
-  {
-    path: '/articles',
-    element: <ArticlesPage />,
-  },
-  {
-    path: '/articles/:slug',
-    element: <ArticleDetailPage />,
-  },
 ]);
 
 createRoot(document.getElementById('root')!).render(
