@@ -15,6 +15,7 @@ import type { UserStats as UserStatsType } from './lib/puzzleService';
 import type { ChessPuzzle as ChessPuzzleType } from './types';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Header } from './components/Header';
+import { HiddenGemsSection } from './components/HiddenGemsSection';
 import { useNavigate } from 'react-router-dom';
 
 type Puzzle = Database['public']['Tables']['puzzles']['Row'];
@@ -244,6 +245,8 @@ function App() {
               onComplete={handlePuzzleComplete}
             />
           </div>
+
+          <HiddenGemsSection />
 
           {user ? (
             <UserStats {...userStats} />
