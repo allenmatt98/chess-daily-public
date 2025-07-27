@@ -35,6 +35,13 @@ function App() {
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const navigate = useNavigate();
 
+  // Auto-show How to Play for first-time guest users
+  useEffect(() => {
+    if (!user && !localStorage.getItem('hasSeenHowToPlay')) {
+      setShowHowToPlay(true);
+    }
+  }, [user]);
+
   const fetchPuzzle = useCallback(async (force = false) => {
     try {
       setError(null);
@@ -260,9 +267,16 @@ function App() {
               <button
                 className="absolute top-3 right-3 text-2xl font-bold focus:outline-none transition-colors duration-200"
                 style={{ color: 'var(--color-text-muted)' }}
-                onMouseEnter={(e) => e.target.style.color = 'var(--color-text)'}
-                onMouseLeave={(e) => e.target.style.color = 'var(--color-text-muted)'}
-                onClick={() => setShowHowToPlay(false)}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+                  e.currentTarget.style.color = 'var(--color-text)';
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+                  e.currentTarget.style.color = 'var(--color-text-muted)';
+                }}
+                onClick={() => {
+                  setShowHowToPlay(false);
+                  localStorage.setItem('hasSeenHowToPlay', '1');
+                }}
                 aria-label="Close How to Play"
               >
                 ×
@@ -287,7 +301,10 @@ function App() {
               <div className="flex justify-end">
                 <button
                   className="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-600 transition-all text-sm"
-                  onClick={() => setShowHowToPlay(false)}
+                  onClick={() => {
+                    setShowHowToPlay(false);
+                    localStorage.setItem('hasSeenHowToPlay', '1');
+                  }}
                 >
                   Got it!
                 </button>
