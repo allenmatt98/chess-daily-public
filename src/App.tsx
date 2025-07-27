@@ -16,6 +16,7 @@ import type { ChessPuzzle as ChessPuzzleType } from './types';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Header } from './components/Header';
 import { useNavigate } from 'react-router-dom';
+import { HiddenGemsSection } from './components/HiddenGemsSection';
 
 type Puzzle = Database['public']['Tables']['puzzles']['Row'];
 
@@ -250,6 +251,11 @@ function App() {
           ) : (
             <AuthPrompt onSignIn={() => setShowAuthModal(true)} />
           )}
+
+          {/* Hidden Gems Section */}
+          <div className="mt-6 sm:mt-8">
+            <HiddenGemsSection />
+          </div>
         </main>
 
         <div className="footer-container">
