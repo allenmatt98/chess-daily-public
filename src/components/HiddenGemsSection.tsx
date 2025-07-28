@@ -145,11 +145,7 @@ export function HiddenGemsSection({ className = '' }: HiddenGemsSectionProps) {
             Discover fascinating stories, secrets, and legends from chess history
           </p>
         </div>
-        
-        {/* Ad Space Placeholder */}
-        <div className="hidden lg:block w-32 h-20 rounded-lg border-2 border-dashed flex items-center justify-center text-xs" style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}>
-          Ad Space
-        </div>
+        {/* Removed Ad Space Placeholder */}
       </div>
 
       {/* Carousel Container */}
@@ -157,7 +153,7 @@ export function HiddenGemsSection({ className = '' }: HiddenGemsSectionProps) {
         {/* Navigation Arrows - Desktop */}
         <button
           onClick={goToPrevious}
-          className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-10 h-10 items-center justify-center rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+          className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-8 z-20 w-10 h-10 items-center justify-center rounded-full shadow-xl bg-white/80 backdrop-blur-md border border-gray-300 transition-all duration-200 hover:scale-110"
           style={{ 
             backgroundColor: 'var(--color-surface)',
             borderColor: 'var(--color-border)',
@@ -170,7 +166,7 @@ export function HiddenGemsSection({ className = '' }: HiddenGemsSectionProps) {
 
         <button
           onClick={goToNext}
-          className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-10 h-10 items-center justify-center rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+          className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-8 z-20 w-10 h-10 items-center justify-center rounded-full shadow-xl bg-white/80 backdrop-blur-md border border-gray-300 transition-all duration-200 hover:scale-110"
           style={{ 
             backgroundColor: 'var(--color-surface)',
             borderColor: 'var(--color-border)',
@@ -270,11 +266,6 @@ export function HiddenGemsSection({ className = '' }: HiddenGemsSectionProps) {
         >
           View All Articles
         </button>
-      </div>
-
-      {/* Mobile Ad Space */}
-      <div className="lg:hidden mt-6 w-full h-16 rounded-lg border-2 border-dashed flex items-center justify-center text-xs" style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}>
-        Mobile Ad Space
       </div>
     </section>
   );

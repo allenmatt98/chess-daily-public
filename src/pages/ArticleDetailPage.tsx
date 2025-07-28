@@ -146,7 +146,7 @@ export default function ArticleDetailPage() {
                 Articles
               </button>
               <span>/</span>
-              <span className="text-white">{article.category}</span>
+              <span className="text-white">{article.category_name}</span>
             </nav>
 
             <button
@@ -188,39 +188,10 @@ export default function ArticleDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Main Content */}
             <article className="lg:col-span-3">
-              {/* Back Navigation */}
-              <div className="flex items-center gap-4 mb-8">
-                <button
-                  onClick={() => navigate('/articles')}
-                  className="inline-flex items-center gap-2 text-sm transition-colors duration-200 hover:text-green-400"
-                  style={{ color: 'var(--color-text-muted)' }}
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Back to Articles
-                </button>
-                
-                <button
-                  onClick={() => navigate('/')}
-                  className="inline-flex items-center gap-2 text-sm transition-colors duration-200 hover:text-green-400"
-                  style={{ color: 'var(--color-text-muted)' }}
-                >
-                  <BookOpen className="w-4 h-4" />
-                  Back to Homepage
-                </button>
-              </div>
-
               {/* Article Body */}
               <div 
-                className="prose prose-lg max-w-none"
-                style={{ 
-                  color: 'var(--color-text)',
-                  '--tw-prose-headings': 'var(--color-text)',
-                  '--tw-prose-links': '#22c55e',
-                  '--tw-prose-bold': 'var(--color-text)',
-                  '--tw-prose-quotes': 'var(--color-text-muted)',
-                  '--tw-prose-quote-borders': '#22c55e',
-                  '--tw-prose-code': 'var(--color-text)',
-                }}
+                className="prose prose-lg max-w-none custom-prose"
+                style={{ color: 'var(--color-text)' }}
                 dangerouslySetInnerHTML={{ __html: article.content || article.excerpt }}
               />
 
@@ -268,13 +239,6 @@ export default function ArticleDetailPage() {
 
             {/* Sidebar */}
             <aside className="lg:col-span-1">
-              {/* Ad Space */}
-              <div className="card p-4 mb-6">
-                <div className="w-full h-64 rounded-lg border-2 border-dashed flex items-center justify-center text-sm" style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}>
-                  Article Sidebar Ad
-                </div>
-              </div>
-
               {/* Table of Contents (if needed) */}
               <div className="card p-4 mb-6">
                 <h3 className="font-semibold mb-3" style={{ color: 'var(--color-text)' }}>
@@ -319,13 +283,6 @@ export default function ArticleDetailPage() {
                 </div>
               </div>
             </aside>
-          </div>
-        </div>
-
-        {/* Mobile Ad Space */}
-        <div className="lg:hidden mx-4 mb-8">
-          <div className="w-full h-20 rounded-lg border-2 border-dashed flex items-center justify-center text-sm" style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}>
-            Mobile Article Ad
           </div>
         </div>
       </main>
