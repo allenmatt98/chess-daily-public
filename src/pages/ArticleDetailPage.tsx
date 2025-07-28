@@ -130,109 +130,73 @@ export default function ArticleDetailPage() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
           
           {/* Navigation Overlay */}
-          <div className="absolute top-6 left-6 right-6 flex items-center justify-between">
-            <nav className="flex items-center space-x-2 text-sm text-white/80">
+          <div className="absolute top-4 sm:top-6 left-4 sm:left-6 right-4 sm:right-6 flex items-center justify-between">
+            <nav className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-white/80">
               <button
                 onClick={() => navigate('/')}
-                className="hover:text-white transition-colors duration-200"
+                className="hover:text-white transition-colors duration-200 truncate"
               >
                 Home
               </button>
-              <span>/</span>
+              <span className="hidden sm:inline">/</span>
               <button
                 onClick={() => navigate('/articles')}
-                className="hover:text-white transition-colors duration-200"
+                className="hover:text-white transition-colors duration-200 truncate"
               >
                 Articles
               </button>
-              <span>/</span>
-              <span className="text-white">{article.category_name}</span>
+              <span className="hidden sm:inline">/</span>
+              <span className="text-white truncate">{article.category_name}</span>
             </nav>
 
             <button
               onClick={handleShare}
-              className="p-2 rounded-full bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 transition-all duration-200"
+              className="p-1.5 sm:p-2 rounded-full bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 transition-all duration-200 flex-shrink-0"
               aria-label="Share article"
             >
-              <Share2 className="w-5 h-5" />
+              <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
 
           {/* Article Meta */}
-          <div className="absolute bottom-6 left-6 right-6">
-            <div className="flex flex-wrap items-center gap-2 mb-4 text-sm text-white/80">
-              <span 
-                className="px-2 py-1 rounded-full text-white font-medium"
-                style={{ backgroundColor: article.category_color }}
-              >
-                {article.category_name}
-              </span>
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                {article.read_time_minutes} min read
-              </div>
-              <div className="flex items-center gap-1">
-                <Calendar className="w-4 h-4" />
-                {formatDate(article.published_at)}
-              </div>
-            </div>
-            
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
+          <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-white leading-tight">
               {article.title}
             </h1>
           </div>
         </div>
 
         {/* Article Content */}
-        <div className="max-w-4xl mx-auto px-4 py-8 lg:py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8">
             {/* Main Content */}
             <article className="lg:col-span-3">
               {/* Article Body */}
               <div 
-                className="prose prose-lg max-w-none custom-prose"
+                className="prose prose-sm sm:prose-base lg:prose-lg max-w-none custom-prose"
                 style={{ color: 'var(--color-text)' }}
                 dangerouslySetInnerHTML={{ __html: article.content || article.excerpt }}
               />
 
               {/* Tags */}
-              <div className="mt-8 pt-8 border-t" style={{ borderColor: 'var(--color-border)' }}>
-                <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
+              <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t" style={{ borderColor: 'var(--color-border)' }}>
+                <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: 'var(--color-text)' }}>
                   Tags
                 </h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   {article.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-colors duration-200 hover:bg-green-500 hover:text-white cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm transition-colors duration-200 hover:bg-green-500 hover:text-white cursor-pointer"
                       style={{ 
                         backgroundColor: 'var(--color-border)', 
                         color: 'var(--color-text-muted)' 
                       }}
                     >
-                      <Tag className="w-3 h-3" />
+                      <Tag className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                       {tag}
                     </span>
                   ))}
-                </div>
-              </div>
-
-              {/* Author Bio */}
-              <div className="mt-8 pt-8 border-t" style={{ borderColor: 'var(--color-border)' }}>
-                <div className="flex items-start gap-4">
-                  <img
-                    src={article.author_avatar_url}
-                    alt={article.author_name}
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
-                      {article.author_name}
-                    </h3>
-                    <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                      {article.author_bio}
-                    </p>
-                  </div>
                 </div>
               </div>
             </article>
@@ -240,45 +204,45 @@ export default function ArticleDetailPage() {
             {/* Sidebar */}
             <aside className="lg:col-span-1">
               {/* Table of Contents (if needed) */}
-              <div className="card p-4 mb-6">
-                <h3 className="font-semibold mb-3" style={{ color: 'var(--color-text)' }}>
+              <div className="card p-3 sm:p-4 mb-4 sm:mb-6">
+                <h3 className="font-semibold mb-2 sm:mb-3 text-sm sm:text-base" style={{ color: 'var(--color-text)' }}>
                   Quick Actions
                 </h3>
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   <button
                     onClick={handleShare}
-                    className="w-full btn-secondary text-sm flex items-center gap-2"
+                    className="w-full btn-secondary text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2"
                   >
-                    <Share2 className="w-4 h-4" />
+                    <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     Share Article
                   </button>
                   <button
                     onClick={() => navigate('/articles')}
-                    className="w-full btn-secondary text-sm flex items-center gap-2"
+                    className="w-full btn-secondary text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2"
                   >
-                    <BookOpen className="w-4 h-4" />
+                    <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     More Articles
                   </button>
                 </div>
               </div>
 
               {/* Reading Progress */}
-              <div className="card p-4">
-                <h3 className="font-semibold mb-3" style={{ color: 'var(--color-text)' }}>
+              <div className="card p-3 sm:p-4">
+                <h3 className="font-semibold mb-2 sm:mb-3 text-sm sm:text-base" style={{ color: 'var(--color-text)' }}>
                   Article Info
                 </h3>
-                <div className="space-y-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    {article.read_time_minutes} min read
+                <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <span className="whitespace-nowrap">{article.read_time_minutes} min read</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    {formatDate(article.published_at)}
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <span className="whitespace-nowrap">{formatDate(article.published_at)}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Tag className="w-4 h-4" />
-                    {article.tags.length} tags
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <Tag className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                    <span>{article.tags.length} tags</span>
                   </div>
                 </div>
               </div>

@@ -136,12 +136,12 @@ export function HiddenGemsSection({ className = '' }: HiddenGemsSectionProps) {
       aria-label="Hidden Gems from the Chess World"
     >
       {/* Section Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
         <div>
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
+          <h2 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold mb-1 sm:mb-2" style={{ color: 'var(--color-text)' }}>
             Hidden Gems from the Chess World
           </h2>
-          <p className="text-sm sm:text-base" style={{ color: 'var(--color-text-muted)' }}>
+          <p className="text-xs sm:text-sm lg:text-base" style={{ color: 'var(--color-text-muted)' }}>
             Discover fascinating stories, secrets, and legends from chess history
           </p>
         </div>
@@ -191,46 +191,63 @@ export function HiddenGemsSection({ className = '' }: HiddenGemsSectionProps) {
           >
             {Array.from({ length: Math.ceil(articles.length / 3) }).map((_, slideIndex) => (
               <div key={slideIndex} className="w-full flex-shrink-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
                   {articles.slice(slideIndex * 3, slideIndex * 3 + 3).map((article) => (
                     <article
                       key={article.id}
                       className="group cursor-pointer transition-all duration-300 hover:scale-105"
                       onClick={() => navigate(`/articles/${article.slug}`)}
                     >
-                      {/* Article Card */}
-                      <div className="card p-4 h-full flex flex-col">
+                      <div className="card p-3 sm:p-4 h-full flex flex-col">
                         {/* Thumbnail */}
-                        <div className="relative mb-4 overflow-hidden rounded-lg">
+                        <div className="relative mb-3 sm:mb-4 overflow-hidden rounded-lg">
                           <img
                             src={article.thumbnail_url}
                             alt={article.title}
-                            className="w-full h-32 sm:h-40 object-cover transition-transform duration-300 group-hover:scale-110"
+                            className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
                             loading="lazy"
                           />
-                          <div className="absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium bg-black/70 text-white">
+                          <div className="absolute top-2 sm:top-3 right-2 sm:right-3 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-black/70 text-white">
                             {article.read_time_minutes} min read
                           </div>
-                          <div className="absolute bottom-2 left-2 px-2 py-1 rounded-full text-xs font-medium bg-green-500 text-white">
+                          <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-green-500 text-white">
                             {article.category_name}
                           </div>
                         </div>
 
                         {/* Content */}
                         <div className="flex-1 flex flex-col">
-                          <h3 className="font-bold text-sm sm:text-base lg:text-lg mb-2 line-clamp-2 group-hover:text-green-400 transition-colors duration-200" style={{ color: 'var(--color-text)' }}>
-                            {truncateText(article.title, 60)}
+                          <h3 className="font-bold text-sm sm:text-base lg:text-lg mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-green-400 transition-colors duration-200" style={{ color: 'var(--color-text)' }}>
+                            {article.title}
                           </h3>
                           
-                          <p className="text-xs sm:text-sm mb-4 flex-1 line-clamp-3" style={{ color: 'var(--color-text-muted)' }}>
-                            {truncateText(article.excerpt, 160)}
+                          <p className="text-xs sm:text-sm mb-3 sm:mb-4 flex-1 line-clamp-3" style={{ color: 'var(--color-text-muted)' }}>
+                            {truncateText(article.excerpt, 120)}
                           </p>
 
-                          {/* Read More Button */}
-                          <button className="btn-secondary text-xs sm:text-sm flex items-center gap-2 self-start group-hover:bg-green-500 group-hover:text-white transition-all duration-200">
-                            Read More
-                            <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
-                          </button>
+                          {/* Tags */}
+                          <div className="flex flex-wrap gap-1 mb-2 sm:mb-3">
+                            {article.tags.slice(0, 2).map((tag) => (
+                              <span
+                                key={tag}
+                                className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-xs transition-colors duration-200 hover:bg-green-500 hover:text-white cursor-pointer"
+                                style={{ 
+                                  backgroundColor: 'var(--color-border)', 
+                                  color: 'var(--color-text-muted)' 
+                                }}
+                              >
+                                <ExternalLink className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+
+                          {/* Date */}
+                          <div className="mt-auto">
+                            <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                              {formatDate(article.published_at)}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </article>
@@ -241,16 +258,16 @@ export function HiddenGemsSection({ className = '' }: HiddenGemsSectionProps) {
           </div>
         </div>
 
-        {/* Carousel Indicators */}
-        <div className="flex justify-center mt-6 space-x-2">
+        {/* Mobile Navigation Dots */}
+        <div className="flex justify-center mt-4 sm:mt-6 md:hidden">
           {Array.from({ length: Math.ceil(articles.length / 3) }).map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-200 ${
+              className={`w-2 h-2 rounded-full mx-1 transition-all duration-200 ${
                 index === currentIndex 
-                  ? 'bg-green-500 w-6' 
-                  : 'bg-gray-400 hover:bg-gray-300'
+                  ? 'bg-green-500' 
+                  : 'bg-gray-300'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />

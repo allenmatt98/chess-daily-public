@@ -129,8 +129,8 @@ export default function ArticlesPage() {
         </div>
 
         {/* Search and Filter Controls */}
-        <div className="card p-4 sm:p-6 mb-8">
-          <div className="flex flex-col lg:flex-row gap-4">
+        <div className="card p-3 sm:p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             {/* Search Bar */}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: 'var(--color-text-muted)' }} />
@@ -139,7 +139,7 @@ export default function ArticlesPage() {
                 placeholder="Search articles, topics, or tags..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="w-full pl-10 pr-4 py-2.5 sm:py-2 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm sm:text-base"
                 style={{
                   backgroundColor: 'var(--color-surface)',
                   borderColor: 'var(--color-border)',
@@ -149,12 +149,12 @@ export default function ArticlesPage() {
             </div>
 
             {/* Category Filter */}
-            <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4" style={{ color: 'var(--color-text-muted)' }} />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: 'var(--color-text-muted)' }} />
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 py-2 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="px-2.5 sm:px-3 py-2.5 sm:py-2 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm sm:text-base"
                 style={{
                   backgroundColor: 'var(--color-surface)',
                   borderColor: 'var(--color-border)',
@@ -169,12 +169,12 @@ export default function ArticlesPage() {
             </div>
 
             {/* Sort Options */}
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" style={{ color: 'var(--color-text-muted)' }} />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: 'var(--color-text-muted)' }} />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'readTime')}
-                className="px-3 py-2 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="px-2.5 sm:px-3 py-2.5 sm:py-2 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm sm:text-base"
                 style={{
                   backgroundColor: 'var(--color-surface)',
                   borderColor: 'var(--color-border)',
@@ -190,8 +190,8 @@ export default function ArticlesPage() {
         </div>
 
         {/* Results Count */}
-        <div className="mb-6">
-          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+        <div className="mb-4 sm:mb-6">
+          <p className="text-xs sm:text-sm" style={{ color: 'var(--color-text-muted)' }}>
             Showing {filteredAndSortedArticles.length} of {articles.length} articles
             {searchTerm && ` for "${searchTerm}"`}
             {selectedCategory && ` in ${categories.find(c => c.slug === selectedCategory)?.name}`}
@@ -199,63 +199,62 @@ export default function ArticlesPage() {
         </div>
 
         {/* Articles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {filteredAndSortedArticles.map((article) => (
             <article
               key={article.id}
               className="group cursor-pointer transition-all duration-300 hover:scale-105"
               onClick={() => navigate(`/articles/${article.slug}`)}
             >
-              <div className="card p-4 h-full flex flex-col">
+              <div className="card p-3 sm:p-4 h-full flex flex-col">
                 {/* Thumbnail */}
-                <div className="relative mb-4 overflow-hidden rounded-lg">
+                <div className="relative mb-3 sm:mb-4 overflow-hidden rounded-lg">
                   <img
                     src={article.thumbnail_url}
                     alt={article.title}
-                    className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="w-full h-40 sm:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
                     loading="lazy"
                   />
-                  <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium bg-black/70 text-white">
+                  <div className="absolute top-2 sm:top-3 right-2 sm:right-3 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-black/70 text-white">
                     {article.read_time_minutes} min read
                   </div>
-                  <div className="absolute bottom-3 left-3 px-2 py-1 rounded-full text-xs font-medium bg-green-500 text-white">
+                  <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-green-500 text-white">
                     {article.category_name}
                   </div>
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 flex flex-col">
-                  <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-green-400 transition-colors duration-200" style={{ color: 'var(--color-text)' }}>
+                  <h3 className="font-bold text-base sm:text-lg mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-green-400 transition-colors duration-200" style={{ color: 'var(--color-text)' }}>
                     {article.title}
                   </h3>
                   
-                  <p className="text-sm mb-4 flex-1 line-clamp-3" style={{ color: 'var(--color-text-muted)' }}>
+                  <p className="text-xs sm:text-sm mb-3 sm:mb-4 flex-1 line-clamp-3" style={{ color: 'var(--color-text-muted)' }}>
                     {article.excerpt}
                   </p>
 
                   {/* Tags */}
-                  <div className="flex flex-wrap gap-1 mb-4">
+                  <div className="flex flex-wrap gap-1 mb-3 sm:mb-4">
                     {article.tags.slice(0, 3).map((tag) => (
                       <span
                         key={tag}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs"
+                        className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-xs transition-colors duration-200 hover:bg-green-500 hover:text-white cursor-pointer"
                         style={{ 
                           backgroundColor: 'var(--color-border)', 
                           color: 'var(--color-text-muted)' 
                         }}
                       >
-                        <Tag className="w-3 h-3" />
+                        <Tag className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         {tag}
                       </span>
                     ))}
                   </div>
 
-                  {/* Meta Info */}
-                  <div className="flex items-center justify-between text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                    <span>{formatDate(article.published_at)}</span>
-                    <button className="btn-secondary text-xs px-3 py-1 group-hover:bg-green-500 group-hover:text-white transition-all duration-200">
-                      Read More
-                    </button>
+                  {/* Date */}
+                  <div className="mt-auto">
+                    <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                      {formatDate(article.published_at)}
+                    </p>
                   </div>
                 </div>
               </div>
