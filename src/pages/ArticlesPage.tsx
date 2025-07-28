@@ -119,26 +119,12 @@ export default function ArticlesPage() {
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
           <div className="mb-6 lg:mb-0">
-            <button
-              onClick={() => navigate('/')}
-              className="inline-flex items-center gap-2 mb-4 text-sm transition-colors duration-200 hover:text-green-400"
-              style={{ color: 'var(--color-text-muted)' }}
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Homepage
-            </button>
-            
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
               Hidden Gems from the Chess World
             </h1>
             <p className="text-base sm:text-lg" style={{ color: 'var(--color-text-muted)' }}>
               Explore fascinating stories, secrets, and legends from chess history
             </p>
-          </div>
-
-          {/* Desktop Ad Space */}
-          <div className="hidden lg:block w-48 h-24 rounded-lg border-2 border-dashed flex items-center justify-center text-sm" style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}>
-            Article Page Ad
           </div>
         </div>
 
