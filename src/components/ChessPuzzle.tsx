@@ -85,22 +85,22 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     const padding = 32; // Account for container padding
     
     // For very high-resolution screens (like 2400x1800), use viewport units
-    if (screenWidth >= 2400) {
-      return Math.min(600, Math.max(400, screenWidth * 0.15));
+    if (screenWidth >= 2560) {
+      return Math.min(900, Math.max(700, screenWidth * 0.30));
     } else if (screenWidth >= 1920) {
-      return Math.min(500, Math.max(350, screenWidth * 0.18));
+      return Math.min(800, Math.max(600, screenWidth * 0.35));
     } else if (screenWidth >= 1440) {
-      return Math.min(480, Math.max(320, screenWidth * 0.2));
+      return Math.min(700, Math.max(500, screenWidth * 0.40));
     } else if (screenWidth >= 1024) {
-      return Math.min(440, Math.max(300, screenWidth * 0.25));
+      return Math.min(600, Math.max(450, screenWidth * 0.45));
     } else if (screenWidth >= 768) {
-      return Math.min(400, Math.max(280, screenWidth * 0.35));
+      return Math.min(550, Math.max(400, screenWidth * 0.50));
     } else if (screenWidth >= 640) {
-      return Math.min(360, Math.max(260, screenWidth * 0.45));
+      return Math.min(500, Math.max(350, screenWidth * 0.55));
     } else if (screenWidth >= 480) {
-      return Math.min(320, Math.max(240, screenWidth * 0.55));
+      return Math.min(450, Math.max(300, screenWidth * 0.60));
     } else {
-      return Math.min(280, Math.max(220, screenWidth * 0.65));
+      return Math.min(400, Math.max(280, screenWidth * 0.70));
     }
   };
 
@@ -700,14 +700,14 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
 
             {/* Chess board container with improved responsive design */}
             <div className="flex justify-center mb-4 sm:mb-6">
-              <div className="chess-board-wrapper p-2 sm:p-3 lg:p-4 rounded-xl" style={{ 
+              <div className="chess-board-wrapper p-1 sm:p-2 lg:p-3 rounded-xl w-full max-w-4xl" style={{ 
                 backgroundColor: 'var(--color-surface)',
                 border: '1px solid var(--color-border)'
               }}>
-                <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`} style={{ 
-                  width: boardWidth, 
-                  height: boardWidth,
-                  minWidth: '220px',
+                <div className={`chess-board-container ${isDarkMode ? 'dark' : ''} flex justify-center`} style={{ 
+                  width: '100%',
+                  height: 'auto',
+                  minWidth: '280px',
                   maxWidth: '100%'
                 }}>
                   <Chessboard
