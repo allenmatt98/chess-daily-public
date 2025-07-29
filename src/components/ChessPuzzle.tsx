@@ -12,7 +12,7 @@ import { updateGuestStats } from '../lib/guestStats';
 import { savePuzzleCompletion, getPuzzleCompletion } from '../lib/completionStorage';
 import { Target } from 'lucide-react';
 import type { ChessPuzzleProps } from '../types';
-import type { UserStats as UserStatsType } from '../lib/puzzleService';
+import type { UserStats } from '../lib/puzzleService';
 import { getGuestStats } from '../lib/guestStats';
 
 export const ATTEMPT_CLASS = {
