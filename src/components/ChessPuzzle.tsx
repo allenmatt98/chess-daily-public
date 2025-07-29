@@ -733,11 +733,11 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       </div>
 
       {/* Desktop Layout - Chess board focused with right sidebar */}
-      <div className="hidden lg:grid lg:grid-cols-12 lg:gap-4 xl:gap-6 lg:h-[calc(100vh-200px)]">
+      <div className="hidden lg:grid lg:grid-cols-12 lg:gap-4 xl:gap-6 lg:min-h-[calc(100vh-240px)]">
         {/* Left Column - Chess board and hint */}
-        <div className="lg:col-span-8 xl:col-span-8 flex flex-col">
+        <div className="lg:col-span-8 xl:col-span-8 flex flex-col gap-4">
           {/* Chess Board - takes most space */}
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex-1 flex items-center justify-center min-h-0">
             <div className="chess-board-wrapper p-3 rounded-xl" style={{ 
               backgroundColor: 'var(--color-surface)',
               border: '1px solid var(--color-border)'
@@ -759,8 +759,8 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
             </div>
           </div>
           
-          {/* Hint Component below board - always visible */}
-          <div className="mt-3">
+          {/* Hint Component below board */}
+          <div className="flex-shrink-0">
             <HintComponent
               onShowHint={showHint}
               hintsUsed={hintsUsed}
@@ -770,9 +770,55 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         </div>
 
         {/* Right Sidebar - Compact info */}
-        <div className="lg:col-span-4 xl:col-span-4 space-y-3 overflow-y-auto">
+        <div className="lg:col-span-4 xl:col-span-4 space-y-4 flex flex-col">
           {/* Compact Puzzle Info */}
-          <PuzzleHeader
+          <div className="flex-shrink-0">
+            <PuzzleHeader
+              puzzleNumber={puzzle.metadata?.absolute_number || 1}
+              objective={puzzleObjective}
+              elapsedTime={elapsedTime}
+              hintsUsed={hintsUsed}
+              progressPercentage={progressPercentage}
+              formatTime={formatTime}
+            />
+          </div>
+
+          {/* Progress Section */}
+          <div className="flex-shrink-0">
+            <div className="card p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Target className="w-4 h-4 text-green-400" />
+                <h3 className="text-base font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
+              </div>
+              {renderProgressGrid()}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Rating/Stats Component - Below chess board on desktop */}
+      <div className="hidden lg:block mt-6">
+        {user ? (
+          <UserStats {...currentStats} />
+        ) : (
+          <AuthPrompt onSignIn={() => setShowAuthModal(true)} />
+        )}
+      </div>
+
+      {/* Victory celebration - rendered at top level */}
+      {showVictory && victoryStats && (
+        <VictoryCelebration
+          elapsedTime={finalTimeRef.current}
+          onComplete={() => setShowVictory(false)}
+          rating={victoryStats.rating}
+          ratingChange={victoryStats.ratingChange}
+          streak={victoryStats.streak}
+          shareGridData={generateShareGrid()}
+        />
+      )}
+    </div>
+  );
+}
             puzzleNumber={puzzle.metadata?.absolute_number || 1}
             objective={puzzleObjective}
             elapsedTime={elapsedTime}
