@@ -2,13 +2,18 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess, Square } from 'chess.js';
 import { VictoryCelebration } from './VictoryCelebration';
+import { PuzzleHeader } from './PuzzleHeader';
+import { HintComponent } from './HintComponent';
+import { UserStats } from './UserStats';
+import { AuthPrompt } from './AuthPrompt';
 import { useAuthStore } from '../store/authStore';
 import { useTheme } from '../hooks/useTheme';
 import { updateGuestStats } from '../lib/guestStats';
 import { savePuzzleCompletion, getPuzzleCompletion } from '../lib/completionStorage';
-import { Lightbulb, Clock, Target, Zap } from 'lucide-react';
+import { Target } from 'lucide-react';
 import type { ChessPuzzleProps } from '../types';
 import type { UserStats } from '../lib/puzzleService';
+import { getGuestStats } from '../lib/guestStats';
 
 export const ATTEMPT_CLASS = {
   WRONG: 'wrong',
@@ -59,7 +64,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   const timerIntervalRef = useRef<number>();
   const finalTimeRef = useRef<number>(0);
   const moveSequence = puzzle.moves || [];
-  const { user } = useAuthStore();
+  const { user, setShowAuthModal } = useAuthStore();
   const playerColor = puzzle.fen.split(' ')[1] === 'w' ? 'white' : 'black';
   const movesToMate = Math.ceil(moveSequence.length / 2);
   const progressPercentage = isCompleting ? 100 : 
@@ -81,18 +86,41 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   const getBoardWidth = () => {
     if (typeof window === 'undefined') return 300;
     const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-    const padding = 32; // Account for container padding
+    const padding = 16; // Account for container padding
     
-    // For very high-resolution screens (like 2400x1800), use viewport units
-    if (screenWidth >= 2560) {
-      return Math.min(1000, Math.max(800, screenWidth * 0.35));
-    } else if (screenWidth >= 1920) {
-      return Math.min(900, Math.max(700, screenWidth * 0.40));
+    // Desktop/Laptop sizes
+    if (screenWidth >= 1920) {
+      return Math.min(600, screenWidth * 0.35);
     } else if (screenWidth >= 1440) {
-      return Math.min(800, Math.max(600, screenWidth * 0.45));
+      return Math.min(550, screenWidth * 0.38);
     } else if (screenWidth >= 1024) {
-      return Math.min(700, Math.max(550, screenWidth * 0.50));
+      return Math.min(500, screenWidth * 0.45);
+    }
+    // Tablet sizes
+    else if (screenWidth >= 768) {
+      return Math.min(screenWidth - padding * 2, 480);
+    }
+    // Mobile sizes - Galaxy 24 and similar
+    else if (screenWidth >= 400) {
+      return Math.min(screenWidth - padding * 2, 380);
+    }
+    // Small mobile
+    else {
+      return Math.min(screenWidth - padding * 2, 320);
+    }
+  };
+
+  // Get current user stats for display
+  const getCurrentStats = () => {
+    if (user) {
+      // This would come from props or context in a real app
+      return { rating: 1200, currentStreak: 5, highestStreak: 12 };
+    } else {
+      return getGuestStats();
+    }
+  };
+
+  const currentStats = getCurrentStats();
     } else if (screenWidth >= 768) {
       return Math.min(650, Math.max(500, screenWidth * 0.55));
     } else if (screenWidth >= 640) {
@@ -652,85 +680,149 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col transition-colors duration-300" style={{ backgroundColor: 'var(--color-background)' }}>
-      <div className="flex-1 w-full max-w-7xl mx-auto p-2 sm:p-3 lg:p-4 xl:p-6">
-        {/* Mobile Layout - Stack vertically */}
-        <div className="lg:hidden">
-          {/* Compact puzzle header for mobile */}
-          <div className="card p-3 mb-4">
-            <div className="text-center mb-4">
-              <h1 className="text-lg font-bold mb-1" style={{ color: 'var(--color-text)' }}>
-                Puzzle #{puzzle.metadata?.absolute_number || 1}
-              </h1>
-              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{puzzleObjective}</p>
-            </div>
-            
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg border text-sm" style={{ 
-                backgroundColor: 'var(--color-surface)',
-                borderColor: 'var(--color-border)'
-              }}>
-                <Clock className="w-4 h-4 text-green-400" />
-                <span className="font-mono" style={{ color: 'var(--color-text)' }}>{formatTime(elapsedTime)}</span>
-              </div>
-              
-              {hintsUsed > 0 && (
-                <div className="flex items-center gap-2 px-3 py-2 bg-yellow-500/20 border border-yellow-500/30 rounded-lg text-sm">
-                  <Lightbulb className="w-4 h-4 text-yellow-400" />
-                  <span className="text-yellow-300 font-medium">{hintsUsed} hints</span>
-                </div>
-              )}
-            </div>
-            
-            <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--color-border)' }}>
-              <div 
-                className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${progressPercentage}%` }}
-              ></div>
-            </div>
-          </div>
+    <div className="w-full">
+      {/* Mobile Layout - Stack vertically */}
+      <div className="lg:hidden space-y-4">
+        {/* Puzzle Header */}
+        <PuzzleHeader
+          puzzleNumber={puzzle.metadata?.absolute_number || 1}
+          objective={puzzleObjective}
+          elapsedTime={elapsedTime}
+          hintsUsed={hintsUsed}
+          progressPercentage={progressPercentage}
+          formatTime={formatTime}
+        />
 
-          {/* Chess board for mobile */}
-          <div className="flex justify-center mb-4">
-            <div className="chess-board-wrapper p-2 rounded-xl" style={{ 
-              backgroundColor: 'var(--color-surface)',
-              border: '1px solid var(--color-border)'
-            }}>
-              <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`}>
-                <Chessboard
-                  position={game.fen()}
-                  onPieceDrop={handleMove}
-                  onPromotionPieceSelect={handlePromotion}
-                  boardOrientation={playerColor}
-                  customBoardStyle={{ borderRadius: '8px' }}
-                  customDarkSquareStyle={{ backgroundColor: isDarkMode ? '#475569' : '#64748b' }}
-                  customLightSquareStyle={{ backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9' }}
-                  customSquareStyles={getSquareStyles()}
-                  showBoardNotation={boardWidth > 280}
-                  boardWidth={boardWidth}
-                />
-              </div>
+        {/* Chess board */}
+        <div className="flex justify-center">
+          <div className="chess-board-wrapper p-3 rounded-xl" style={{ 
+            backgroundColor: 'var(--color-surface)',
+            border: '1px solid var(--color-border)'
+          }}>
+            <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`}>
+              <Chessboard
+                position={game.fen()}
+                onPieceDrop={handleMove}
+                onPromotionPieceSelect={handlePromotion}
+                boardOrientation={playerColor}
+                customBoardStyle={{ borderRadius: '8px' }}
+                customDarkSquareStyle={{ backgroundColor: isDarkMode ? '#475569' : '#64748b' }}
+                customLightSquareStyle={{ backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9' }}
+                customSquareStyles={getSquareStyles()}
+                showBoardNotation={boardWidth > 280}
+                boardWidth={boardWidth}
+              />
             </div>
-          </div>
-
-          {/* Controls for mobile */}
-          <div className="flex flex-col items-center gap-3 mb-4">
-            <button
-              onClick={showHint}
-              className="btn-secondary flex items-center gap-2 px-6 py-3 text-sm min-w-[140px] justify-center"
-              disabled={isCompleted}
-            >
-              <Lightbulb className="w-4 h-4" />
-              <span>Hint {hintsUsed > 0 && `(${hintsUsed})`}</span>
-            </button>
           </div>
         </div>
 
-        {/* Desktop Layout - Side by side */}
-        <div className="hidden lg:flex lg:gap-8 lg:items-start">
-          {/* Chess board section */}
-          <div className="flex-1 max-w-4xl">
-            <div className="chess-board-wrapper p-4 rounded-xl" style={{ 
+        {/* Hint Component */}
+        <HintComponent
+          onShowHint={showHint}
+          hintsUsed={hintsUsed}
+          isCompleted={isCompleted}
+        />
+
+        {/* Progress Grid */}
+        <div className="card p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Target className="w-5 h-5 text-green-400" />
+            <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
+          </div>
+          {renderProgressGrid()}
+        </div>
+
+        {/* Stats/Auth section for mobile */}
+        <div className="mt-4">
+          {user ? (
+            <UserStats {...currentStats} />
+          ) : (
+            <AuthPrompt onSignIn={() => setShowAuthModal(true)} />
+          )}
+        </div>
+        </div>
+
+      {/* Desktop Layout - Side by side */}
+      <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 xl:gap-8">
+        {/* Left Column - Chess board */}
+        <div className="lg:col-span-7 xl:col-span-8">
+          <div className="space-y-4">
+            {/* Puzzle Header for Desktop */}
+            <PuzzleHeader
+              puzzleNumber={puzzle.metadata?.absolute_number || 1}
+              objective={puzzleObjective}
+              elapsedTime={elapsedTime}
+              hintsUsed={hintsUsed}
+              progressPercentage={progressPercentage}
+              formatTime={formatTime}
+            />
+            
+            {/* Chess Board */}
+            <div className="flex justify-center">
+              <div className="chess-board-wrapper p-4 rounded-xl" style={{ 
+                backgroundColor: 'var(--color-surface)',
+                border: '1px solid var(--color-border)'
+              }}>
+                <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`}>
+                  <Chessboard
+                    position={game.fen()}
+                    onPieceDrop={handleMove}
+                    onPromotionPieceSelect={handlePromotion}
+                    boardOrientation={playerColor}
+                    customBoardStyle={{ borderRadius: '8px' }}
+                    customDarkSquareStyle={{ backgroundColor: isDarkMode ? '#475569' : '#64748b' }}
+                    customLightSquareStyle={{ backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9' }}
+                    customSquareStyles={getSquareStyles()}
+                    showBoardNotation={true}
+                    boardWidth={boardWidth}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Hint Component below board */}
+            <HintComponent
+              onShowHint={showHint}
+              hintsUsed={hintsUsed}
+              isCompleted={isCompleted}
+            />
+          </div>
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="lg:col-span-5 xl:col-span-4 space-y-4">
+          {/* User Stats */}
+          {user ? (
+            <UserStats {...currentStats} />
+          ) : (
+            <AuthPrompt onSignIn={() => setShowAuthModal(true)} />
+          )}
+
+          {/* Progress Section */}
+          <div className="card p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Target className="w-5 h-5 text-green-400" />
+              <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
+            </div>
+            {renderProgressGrid()}
+          </div>
+        </div>
+      </div>
+
+      {/* Victory celebration - rendered at top level */}
+      {showVictory && victoryStats && (
+        <VictoryCelebration
+          elapsedTime={finalTimeRef.current}
+          onComplete={() => setShowVictory(false)}
+          rating={victoryStats.rating}
+          ratingChange={victoryStats.ratingChange}
+          streak={victoryStats.streak}
+          shareGridData={generateShareGrid()}
+        />
+      )}
+    </div>
+  );
+}
               backgroundColor: 'var(--color-surface)',
               border: '1px solid var(--color-border)'
             }}>

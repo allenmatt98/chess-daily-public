@@ -22,28 +22,28 @@ function Terms() {
           <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--color-text)' }}>Terms of Service</h1>
           
           <div className="prose max-w-none">
-            <p className="text-lg mb-6" style={{ color: 'var(--color-text-muted)' }}>
+            <p className="text-sm sm:text-base mb-6" style={{ color: 'var(--color-text-muted)' }}>
               Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
             </p>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>1. Acceptance of Terms</h2>
-              <p style={{ color: 'var(--color-text)' }}>
+              <p className="leading-relaxed" style={{ color: 'var(--color-text)' }}>
                 By accessing and using Daily Chess Puzzle, you accept and agree to be bound by the terms and conditions of this agreement. If you do not agree to these terms, please do not use our service.
               </p>
             </section>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>2. User Accounts</h2>
-              <p className="mb-4" style={{ color: 'var(--color-text)' }}>
+              <p className="mb-4 leading-relaxed" style={{ color: 'var(--color-text)' }}>
                 When you create an account with us, you must provide accurate and complete information. You are responsible for maintaining the security of your account and password. You agree to notify us immediately of any unauthorized access or use of your account.
               </p>
             </section>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>3. Acceptable Use</h2>
-              <p className="mb-4" style={{ color: 'var(--color-text)' }}>You agree not to:</p>
-              <ul className="list-disc pl-6 space-y-2" style={{ color: 'var(--color-text)' }}>
+              <p className="mb-4 leading-relaxed" style={{ color: 'var(--color-text)' }}>You agree not to:</p>
+              <ul className="list-disc pl-6 space-y-2 leading-relaxed" style={{ color: 'var(--color-text)' }}>
                 <li>Use automated methods to solve puzzles</li>
                 <li>Share solutions or hints with other users</li>
                 <li>Attempt to manipulate ratings or statistics</li>
@@ -53,21 +53,21 @@ function Terms() {
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>4. Intellectual Property</h2>
-              <p style={{ color: 'var(--color-text)' }}>
+              <p className="leading-relaxed" style={{ color: 'var(--color-text)' }}>
                 The service and its original content, features, and functionality are owned by Daily Chess Puzzle and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
               </p>
             </section>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>5. Termination</h2>
-              <p style={{ color: 'var(--color-text)' }}>
+              <p className="leading-relaxed" style={{ color: 'var(--color-text)' }}>
                 We may terminate or suspend your account and access to the service immediately, without prior notice or liability, under our sole discretion, for any reason whatsoever, including without limitation if you breach the Terms.
               </p>
             </section>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>6. Contact</h2>
-              <p style={{ color: 'var(--color-text)' }}>
+              <p className="leading-relaxed" style={{ color: 'var(--color-text)' }}>
                 If you have any questions about these Terms, please contact us at{' '}
                 <a href="mailto:support@chess-daily.com" className="text-green-400 hover:text-green-300 transition-colors">
                   support@chess-daily.com

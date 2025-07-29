@@ -267,15 +267,6 @@ function App() {
             />
           </div>
 
-          {/* Stats/Auth section - only show on mobile, hidden on desktop since it's in sidebar */}
-          <div className="lg:hidden mt-4 sm:mt-6">
-            {user ? (
-              <UserStats {...userStats} />
-            ) : (
-              <AuthPrompt onSignIn={() => setShowAuthModal(true)} />
-            )}
-          </div>
-
           {/* Hidden Gems Section */}
           <div className="mt-6 sm:mt-8 lg:mt-12">
             <HiddenGemsSection />

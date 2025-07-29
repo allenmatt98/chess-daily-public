@@ -22,16 +22,16 @@ function Privacy() {
           <h1 className="text-3xl font-bold mb-6" style={{ color: 'var(--color-text)' }}>Privacy Policy</h1>
           
           <div className="prose max-w-none">
-            <p className="text-lg mb-6" style={{ color: 'var(--color-text-muted)' }}>
+            <p className="text-sm sm:text-base mb-6" style={{ color: 'var(--color-text-muted)' }}>
               Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
             </p>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>Information We Collect</h2>
-              <p className="mb-4" style={{ color: 'var(--color-text)' }}>
+              <p className="mb-4 leading-relaxed" style={{ color: 'var(--color-text)' }}>
                 We collect information that you provide directly to us, including:
               </p>
-              <ul className="list-disc pl-6 space-y-2" style={{ color: 'var(--color-text)' }}>
+              <ul className="list-disc pl-6 space-y-2 leading-relaxed" style={{ color: 'var(--color-text)' }}>
                 <li>Email address when you create an account</li>
                 <li>Puzzle solving statistics and progress</li>
                 <li>Game performance and rating information</li>
@@ -40,10 +40,10 @@ function Privacy() {
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>How We Use Your Information</h2>
-              <p className="mb-4" style={{ color: 'var(--color-text)' }}>
+              <p className="mb-4 leading-relaxed" style={{ color: 'var(--color-text)' }}>
                 We use the information we collect to:
               </p>
-              <ul className="list-disc pl-6 space-y-2" style={{ color: 'var(--color-text)' }}>
+              <ul className="list-disc pl-6 space-y-2 leading-relaxed" style={{ color: 'var(--color-text)' }}>
                 <li>Provide, maintain, and improve our services</li>
                 <li>Track your progress and maintain your rating</li>
                 <li>Send you technical notices and support messages</li>
@@ -53,14 +53,14 @@ function Privacy() {
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>Data Security</h2>
-              <p style={{ color: 'var(--color-text)' }}>
+              <p className="leading-relaxed" style={{ color: 'var(--color-text)' }}>
                 We implement appropriate security measures to protect your personal information. However, no method of transmission over the Internet is 100% secure. Therefore, while we strive to protect your personal information, we cannot guarantee its absolute security.
               </p>
             </section>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>Contact Us</h2>
-              <p style={{ color: 'var(--color-text)' }}>
+              <p className="leading-relaxed" style={{ color: 'var(--color-text)' }}>
                 If you have any questions about this Privacy Policy, please contact us at{' '}
                 <a href="mailto:support@chess-daily.com" className="text-green-400 hover:text-green-300 transition-colors">
                   support@chess-daily.com

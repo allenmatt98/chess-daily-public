@@ -99,39 +99,39 @@ export default function HistoricalPuzzles() {
       <main className="flex-1 p-4 max-w-6xl mx-auto w-full">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>Puzzle Archives</h1>
-          <p style={{ color: 'var(--color-text-muted)' }}>
+          <p className="text-base sm:text-lg" style={{ color: 'var(--color-text-muted)' }}>
             Practice with previous daily puzzles and track your progress
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
           {puzzles.map((puzzle) => (
             <div
               key={puzzle.id}
-              className={`card p-4 cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105 ${
+              className={`card p-3 sm:p-4 cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:scale-105 ${
                 puzzle.solved ? 'ring-2 ring-green-500/30' : ''
               }`}
               onClick={() => navigate(`/historical-puzzle/${puzzle.id}`)}
             >
               {miniBoard(puzzle.fen, isDarkMode)}
               
-              <div className="space-y-2">
+              <div className="space-y-2 sm:space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-bold" style={{ color: 'var(--color-text)' }}>
+                  <h3 className="font-bold text-sm sm:text-base" style={{ color: 'var(--color-text)' }}>
                     Puzzle #{puzzle.absolute_number}
                   </h3>
                   {puzzle.solved && (
-                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
                   )}
                 </div>
                 
-                <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                  <Trophy className="w-4 h-4" />
+                <div className="flex items-center gap-2 text-xs sm:text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                  <Trophy className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>Difficulty: {puzzle.difficulty}/5</span>
                 </div>
                 
-                <div className="flex items-center justify-between text-sm">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                <div className="flex items-center justify-between text-xs sm:text-sm">
+                  <span className={`px-2 py-1 rounded-full text-xs sm:text-sm font-medium ${
                     puzzle.solved 
                       ? 'bg-green-500/20 text-green-400' 
                       : 'bg-gray-500/20 text-gray-400'
@@ -141,8 +141,8 @@ export default function HistoricalPuzzles() {
                   
                   {puzzle.solved && puzzle.bestTime && (
                     <div className="flex items-center gap-1" style={{ color: 'var(--color-text-muted)' }}>
-                      <Clock className="w-3 h-3" />
-                      <span>{Math.floor(puzzle.bestTime / 60)}:{(puzzle.bestTime % 60).toString().padStart(2, '0')}</span>
+                      <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="text-xs sm:text-sm">{Math.floor(puzzle.bestTime / 60)}:{(puzzle.bestTime % 60).toString().padStart(2, '0')}</span>
                     </div>
                   )}
                 </div>
