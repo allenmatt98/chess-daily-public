@@ -260,7 +260,7 @@ function App() {
           }
         />
         <main className="flex-1 main-content">
-          <div className="mt-2 sm:mt-4 lg:mt-6">
+          <div className="mt-2 sm:mt-4 lg:mt-4">
             <ChessPuzzle 
               puzzle={puzzleData}
               onComplete={handlePuzzleComplete}
@@ -268,7 +268,7 @@ function App() {
           </div>
 
           {/* Hidden Gems Section */}
-          <div className="mt-6 sm:mt-8 lg:mt-12">
+          <div className="mt-6 sm:mt-8 lg:mt-8">
             <HiddenGemsSection />
           </div>
         </main>

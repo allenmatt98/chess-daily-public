@@ -672,7 +672,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   return (
     <div className="w-full">
       {/* Mobile Layout - Stack vertically */}
-      <div className="lg:hidden space-y-4">
+      <div className="lg:hidden space-y-3 sm:space-y-4">
         {/* Puzzle Header */}
         <PuzzleHeader
           puzzleNumber={puzzle.metadata?.absolute_number || 1}
@@ -684,8 +684,8 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         />
 
         {/* Chess board */}
-        <div className="flex justify-center">
-          <div className="chess-board-wrapper p-3 rounded-xl" style={{ 
+        <div className="flex justify-center px-2 sm:px-0">
+          <div className="chess-board-wrapper p-2 sm:p-3 rounded-xl w-full max-w-sm" style={{ 
             backgroundColor: 'var(--color-surface)',
             border: '1px solid var(--color-border)'
           }}>
@@ -714,16 +714,16 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         />
 
         {/* Progress Grid */}
-        <div className="card p-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Target className="w-5 h-5 text-green-400" />
-            <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
+        <div className="card p-3 sm:p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Target className="w-4 h-4 text-green-400" />
+            <h3 className="text-base font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
           </div>
           {renderProgressGrid()}
         </div>
 
         {/* Stats/Auth section for mobile */}
-        <div className="mt-4">
+        <div className="mt-3">
           {user ? (
             <UserStats {...currentStats} />
           ) : (
@@ -732,45 +732,35 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         </div>
       </div>
 
-      {/* Desktop Layout - Side by side */}
-      <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 xl:gap-8">
-        {/* Left Column - Chess board */}
-        <div className="lg:col-span-7 xl:col-span-8">
-          <div className="space-y-4">
-            {/* Puzzle Header for Desktop */}
-            <PuzzleHeader
-              puzzleNumber={puzzle.metadata?.absolute_number || 1}
-              objective={puzzleObjective}
-              elapsedTime={elapsedTime}
-              hintsUsed={hintsUsed}
-              progressPercentage={progressPercentage}
-              formatTime={formatTime}
-            />
-            
-            {/* Chess Board */}
-            <div className="flex justify-center">
-              <div className="chess-board-wrapper p-4 rounded-xl" style={{ 
-                backgroundColor: 'var(--color-surface)',
-                border: '1px solid var(--color-border)'
-              }}>
-                <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`}>
-                  <Chessboard
-                    position={game.fen()}
-                    onPieceDrop={handleMove}
-                    onPromotionPieceSelect={handlePromotion}
-                    boardOrientation={playerColor}
-                    customBoardStyle={{ borderRadius: '8px' }}
-                    customDarkSquareStyle={{ backgroundColor: isDarkMode ? '#475569' : '#64748b' }}
-                    customLightSquareStyle={{ backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9' }}
-                    customSquareStyles={getSquareStyles()}
-                    showBoardNotation={true}
-                    boardWidth={boardWidth}
-                  />
-                </div>
+      {/* Desktop Layout - Chess board focused with right sidebar */}
+      <div className="hidden lg:grid lg:grid-cols-12 lg:gap-4 xl:gap-6 lg:h-[calc(100vh-200px)]">
+        {/* Left Column - Chess board and hint */}
+        <div className="lg:col-span-8 xl:col-span-8 flex flex-col">
+          {/* Chess Board - takes most space */}
+          <div className="flex-1 flex items-center justify-center">
+            <div className="chess-board-wrapper p-3 rounded-xl" style={{ 
+              backgroundColor: 'var(--color-surface)',
+              border: '1px solid var(--color-border)'
+            }}>
+              <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`}>
+                <Chessboard
+                  position={game.fen()}
+                  onPieceDrop={handleMove}
+                  onPromotionPieceSelect={handlePromotion}
+                  boardOrientation={playerColor}
+                  customBoardStyle={{ borderRadius: '8px' }}
+                  customDarkSquareStyle={{ backgroundColor: isDarkMode ? '#475569' : '#64748b' }}
+                  customLightSquareStyle={{ backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9' }}
+                  customSquareStyles={getSquareStyles()}
+                  showBoardNotation={true}
+                  boardWidth={boardWidth}
+                />
               </div>
             </div>
-            
-            {/* Hint Component below board */}
+          </div>
+          
+          {/* Hint Component below board - always visible */}
+          <div className="mt-3">
             <HintComponent
               onShowHint={showHint}
               hintsUsed={hintsUsed}
@@ -779,24 +769,36 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           </div>
         </div>
 
-        {/* Right Sidebar */}
-        <div className="lg:col-span-5 xl:col-span-4 space-y-4">
-          {/* User Stats */}
-          {user ? (
-            <UserStats {...currentStats} />
-          ) : (
-            <AuthPrompt onSignIn={() => setShowAuthModal(true)} />
-          )}
+        {/* Right Sidebar - Compact info */}
+        <div className="lg:col-span-4 xl:col-span-4 space-y-3 overflow-y-auto">
+          {/* Compact Puzzle Info */}
+          <PuzzleHeader
+            puzzleNumber={puzzle.metadata?.absolute_number || 1}
+            objective={puzzleObjective}
+            elapsedTime={elapsedTime}
+            hintsUsed={hintsUsed}
+            progressPercentage={progressPercentage}
+            formatTime={formatTime}
+          />
 
           {/* Progress Section */}
-          <div className="card p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Target className="w-5 h-5 text-green-400" />
-              <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
+          <div className="card p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Target className="w-4 h-4 text-green-400" />
+              <h3 className="text-base font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
             </div>
             {renderProgressGrid()}
           </div>
         </div>
+      </div>
+
+      {/* Rating/Stats Component - Below chess board on desktop */}
+      <div className="hidden lg:block mt-6">
+        {user ? (
+          <UserStats {...currentStats} />
+        ) : (
+          <AuthPrompt onSignIn={() => setShowAuthModal(true)} />
+        )}
       </div>
 
       {/* Victory celebration - rendered at top level */}

@@ -10,22 +10,22 @@ interface HintComponentProps {
 
 export function HintComponent({ onShowHint, hintsUsed, isCompleted, className = '' }: HintComponentProps) {
   return (
-    <div className={`card p-4 ${className}`}>
+    <div className={`card p-3 sm:p-4 ${className}`}>
       <div className="text-center">
-        <h3 className="text-lg font-semibold mb-3 flex items-center justify-center gap-2" style={{ color: 'var(--color-text)' }}>
-          <Lightbulb className="w-5 h-5 text-yellow-400" />
+        <h3 className="text-base font-semibold mb-2 flex items-center justify-center gap-2" style={{ color: 'var(--color-text)' }}>
+          <Lightbulb className="w-4 h-4 text-yellow-400" />
           Need Help?
         </h3>
-        <p className="text-sm mb-4" style={{ color: 'var(--color-text-muted)' }}>
+        <p className="text-xs sm:text-sm mb-3" style={{ color: 'var(--color-text-muted)' }}>
           Get a hint to see the next move or piece to move
         </p>
         <button
           onClick={onShowHint}
-          className="btn-secondary w-full flex items-center justify-center gap-2 px-6 py-3"
+          className="btn-secondary w-full flex items-center justify-center gap-2 px-4 py-2"
           disabled={isCompleted}
         >
           <Lightbulb className="w-4 h-4" />
-          <span>Get Hint {hintsUsed > 0 && `(${hintsUsed} used)`}</span>
+          <span className="text-sm">Get Hint {hintsUsed > 0 && `(${hintsUsed} used)`}</span>
         </button>
       </div>
     </div>
