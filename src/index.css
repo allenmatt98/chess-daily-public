@@ -447,12 +447,37 @@
   }
 }
 
-/* Landscape mobile adjustments */
-@media (max-width: 896px) and (orientation: landscape) {
+/* Desktop/Laptop optimizations */
+@media (min-width: 1024px) {
   .chess-board-container {
-    max-height: 60vh;
+    /* Ensure board fits without scrolling on desktop */
+    max-height: calc(100vh - 200px);
     width: auto;
     aspect-ratio: 1;
+  }
+  
+  /* Optimize sidebar spacing */
+  .sidebar-section {
+    min-height: 120px;
+  }
+  
+  /* Better spacing for desktop cards */
+  .desktop-card {
+    padding: 1.5rem;
+  }
+}
+
+/* Large desktop optimizations */
+@media (min-width: 1440px) {
+  .chess-board-container {
+    max-height: calc(100vh - 180px);
+  }
+}
+
+/* Ultra-wide desktop optimizations */
+@media (min-width: 1920px) {
+  .chess-board-container {
+    max-height: calc(100vh - 160px);
   }
 }
 

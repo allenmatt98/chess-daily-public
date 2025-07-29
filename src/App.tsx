@@ -260,21 +260,24 @@ function App() {
           }
         />
         <main className="flex-1 main-content">
-          <div className="mt-4 sm:mt-6">
+          <div className="mt-2 sm:mt-4 lg:mt-6">
             <ChessPuzzle 
               puzzle={puzzleData}
               onComplete={handlePuzzleComplete}
             />
           </div>
 
-          {user ? (
-            <UserStats {...userStats} />
-          ) : (
-            <AuthPrompt onSignIn={() => setShowAuthModal(true)} />
-          )}
+          {/* Stats/Auth section - only show on mobile, hidden on desktop since it's in sidebar */}
+          <div className="lg:hidden mt-4 sm:mt-6">
+            {user ? (
+              <UserStats {...userStats} />
+            ) : (
+              <AuthPrompt onSignIn={() => setShowAuthModal(true)} />
+            )}
+          </div>
 
           {/* Hidden Gems Section */}
-          <div className="mt-6 sm:mt-8">
+          <div className="mt-6 sm:mt-8 lg:mt-12">
             <HiddenGemsSection />
           </div>
         </main>

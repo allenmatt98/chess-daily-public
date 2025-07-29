@@ -653,139 +653,76 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
 
   return (
     <div className="min-h-screen flex flex-col transition-colors duration-300" style={{ backgroundColor: 'var(--color-background)' }}>
-      <div className="flex-1 w-full max-w-none mx-auto p-2 sm:p-3 lg:p-4 xl:p-6">
-        {/* Enhanced responsive layout - use full width */}
-        <div className="flex flex-col xl:grid xl:grid-cols-12 gap-3 sm:gap-4 lg:gap-6 h-full">
-          
-          {/* Main puzzle area - use more space */}
-          <div className="xl:col-span-9 order-1">
-            {/* Compact puzzle header */}
-            <div className="card p-2 sm:p-3 lg:p-4 xl:p-5 mb-2 sm:mb-3 lg:mb-4">
-              <div className="flex flex-col space-y-1.5 sm:space-y-2 lg:space-y-3">
-                {/* Title and objective */}
-                <div className="text-center">
-                  <h1 className="text-base sm:text-lg lg:text-xl xl:text-2xl font-bold mb-1 sm:mb-2" style={{ color: 'var(--color-text)' }}>
-                    Puzzle #{puzzle.metadata?.absolute_number || 1}
-                  </h1>
-                  <p className="text-xs sm:text-sm lg:text-base" style={{ color: 'var(--color-text-muted)' }}>{puzzleObjective}</p>
-                </div>
-                
-                {/* Stats row */}
-                <div className="flex items-center justify-center gap-2 sm:gap-3 lg:gap-4 flex-wrap">
-                  <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border text-xs sm:text-sm" style={{ 
-                    backgroundColor: 'var(--color-surface)',
-                    borderColor: 'var(--color-border)'
-                  }}>
-                    <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
-                    <span className="font-mono whitespace-nowrap" style={{ color: 'var(--color-text)' }}>{formatTime(elapsedTime)}</span>
-                  </div>
-                  
-                  {hintsUsed > 0 && (
-                    <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-yellow-500/20 border border-yellow-500/30 rounded-lg text-xs sm:text-sm">
-                      <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 flex-shrink-0" />
-                      <span className="text-yellow-300 font-medium whitespace-nowrap">{hintsUsed} hints</span>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Progress bar */}
-                <div className="w-full rounded-full h-1.5 sm:h-2" style={{ backgroundColor: 'var(--color-border)' }}>
-                  <div 
-                    className="bg-gradient-to-r from-green-500 to-green-400 h-1.5 sm:h-2 rounded-full transition-all duration-500 ease-out"
-                    style={{ width: `${progressPercentage}%` }}
-                  ></div>
-                </div>
-              </div>
+      <div className="flex-1 w-full max-w-7xl mx-auto p-2 sm:p-3 lg:p-4 xl:p-6">
+        {/* Mobile Layout - Stack vertically */}
+        <div className="lg:hidden">
+          {/* Compact puzzle header for mobile */}
+          <div className="card p-3 mb-4">
+            <div className="text-center mb-4">
+              <h1 className="text-lg font-bold mb-1" style={{ color: 'var(--color-text)' }}>
+                Puzzle #{puzzle.metadata?.absolute_number || 1}
+              </h1>
+              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{puzzleObjective}</p>
             </div>
-
-            {/* Chess board container - use full available width */}
-            <div className="flex justify-center mb-3 sm:mb-4 lg:mb-5">
-              <div className="chess-board-wrapper p-1 sm:p-2 lg:p-3 rounded-xl w-full" style={{ 
-                backgroundColor: 'var(--color-surface)',
-                border: '1px solid var(--color-border)'
-              }}>
-                <div className={`chess-board-container ${isDarkMode ? 'dark' : ''} flex justify-center`} style={{ 
-                  width: '100%',
-                  height: 'auto',
-                  minWidth: '280px',
-                  maxWidth: '100%'
-                }}>
-                  <Chessboard
-                    position={game.fen()}
-                    onPieceDrop={handleMove}
-                    onPromotionPieceSelect={handlePromotion}
-                    boardOrientation={playerColor}
-                    customBoardStyle={{
-                      borderRadius: '8px',
-                    }}
-                    customDarkSquareStyle={{
-                      backgroundColor: isDarkMode ? '#475569' : '#64748b'
-                    }}
-                    customLightSquareStyle={{
-                      backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9'
-                    }}
-                    customSquareStyles={getSquareStyles()}
-                    showBoardNotation={boardWidth > 280}
-                    boardWidth={boardWidth}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Controls with improved spacing */}
-            <div className="flex flex-col items-center gap-2 sm:gap-3 lg:gap-4">
-              <button
-                onClick={showHint}
-                className="btn-secondary flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm min-w-[120px] sm:min-w-[140px] justify-center"
-                disabled={isCompleted}
-              >
-                <Lightbulb className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span>Hint {hintsUsed > 0 && `(${hintsUsed})`}</span>
-              </button>
-
-              {wrongMove && (
-                <div className="animate-fade-in w-full max-w-sm sm:max-w-md">
-                  <div className="bg-red-500/20 border border-red-500/30 rounded-lg px-3 sm:px-4 py-2 sm:py-3">
-                    <p className="text-red-300 font-medium text-center text-xs sm:text-sm">
-                      Wrong move! Try again.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Progress sidebar - use less space on desktop */}
-          <aside className="xl:col-span-3 order-2">
-            <div className="card p-2 sm:p-3 lg:p-4 xl:p-5">
-              <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-                <Target className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 flex-shrink-0" />
-                <h3 className="text-sm sm:text-base font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
-              </div>
-              
-              <div className="rounded-lg p-2 sm:p-3 lg:p-4 min-h-[80px] sm:min-h-[100px] flex items-center justify-center border overflow-x-auto" style={{ 
+            
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg border text-sm" style={{ 
                 backgroundColor: 'var(--color-surface)',
                 borderColor: 'var(--color-border)'
               }}>
-                {renderProgressGrid()}
+                <Clock className="w-4 h-4 text-green-400" />
+                <span className="font-mono" style={{ color: 'var(--color-text)' }}>{formatTime(elapsedTime)}</span>
               </div>
               
-              {isCompleted && (
-                <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-green-500/20 border border-green-500/30 rounded-lg">
-                  <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
-                    <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-green-300 font-medium text-xs sm:text-sm">Puzzle Complete!</span>
-                  </div>
-                  <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                    Solved in {formatTime(finalTimeRef.current)} with {hintsUsed} hints
-                  </p>
+              {hintsUsed > 0 && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-yellow-500/20 border border-yellow-500/30 rounded-lg text-sm">
+                  <Lightbulb className="w-4 h-4 text-yellow-400" />
+                  <span className="text-yellow-300 font-medium">{hintsUsed} hints</span>
                 </div>
               )}
             </div>
-          </aside>
-        </div>
-      </div>
+            
+            <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--color-border)' }}>
+              <div 
+                className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${progressPercentage}%` }}
+              ></div>
+            </div>
+          </div>
 
+          {/* Chess board for mobile */}
+          <div className="flex justify-center mb-4">
+            <div className="chess-board-wrapper p-2 rounded-xl" style={{ 
+              backgroundColor: 'var(--color-surface)',
+              border: '1px solid var(--color-border)'
+            }}>
+              <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`}>
+                <Chessboard
+                  position={game.fen()}
+                  onPieceDrop={handleMove}
+                  onPromotionPieceSelect={handlePromotion}
+                  boardOrientation={playerColor}
+                  customBoardStyle={{ borderRadius: '8px' }}
+                  customDarkSquareStyle={{ backgroundColor: isDarkMode ? '#475569' : '#64748b' }}
+                  customLightSquareStyle={{ backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9' }}
+                  customSquareStyles={getSquareStyles()}
+                  showBoardNotation={boardWidth > 280}
+                  boardWidth={boardWidth}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Controls for mobile */}
+          <div className="flex flex-col items-center gap-3 mb-4">
+            <button
+              onClick={showHint}
+              className="btn-secondary flex items-center gap-2 px-6 py-3 text-sm min-w-[140px] justify-center"
+              disabled={isCompleted}
+            >
+              <Lightbulb className="w-4 h-4" />
+              <span>Hint {hintsUsed > 0 && `(${hintsUsed})`}</span>
+            </button>
       {showVictory && victoryStats && (
         <VictoryCelebration
           elapsedTime={finalTimeRef.current}
