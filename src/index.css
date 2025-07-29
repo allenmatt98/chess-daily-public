@@ -43,7 +43,7 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-1 sm:gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-1 sm:gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 border-0;
     min-height: 36px;
     font-size: 0.875rem;
   }
@@ -65,7 +65,7 @@
   }
 
   .card {
-    @apply rounded-xl shadow-xl transition-all duration-300;
+    @apply rounded-xl shadow-lg transition-all duration-300 border;
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
   }
@@ -102,11 +102,9 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-  }
-
-  /* Ensure board fits properly on all screen sizes */
-  .chess-board-container {
+    /* Ensure board fits properly on all screen sizes */
     max-width: 100%;
+    max-height: calc(100vh - 300px);
   }
 
   .progress-grid {
@@ -418,12 +416,13 @@
 /* Mobile-specific responsive adjustments */
 @media (max-width: 640px) {
   .btn {
-    @apply px-2 py-1.5 text-sm;
+    @apply px-3 py-2 text-sm;
     min-height: 32px;
   }
 
   .card {
-    @apply p-3;
+    @apply p-2;
+    margin: 0.25rem;
   }
 
   .progress-cell {
@@ -437,6 +436,10 @@
 
   header {
     min-height: 56px;
+  }
+
+  .chess-board-container {
+    max-height: calc(100vh - 400px);
   }
 }
 
@@ -460,39 +463,43 @@
   header {
     min-height: 52px;
   }
+
+  .chess-board-container {
+    max-height: calc(100vh - 450px);
+  }
 }
 
 /* Desktop/Laptop optimizations */
 @media (min-width: 1024px) {
   .chess-board-container {
     /* Ensure board fits without scrolling on desktop */
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 180px);
     width: auto;
     aspect-ratio: 1;
   }
   
   /* Optimize sidebar spacing */
   .sidebar-section {
-    min-height: 120px;
+    min-height: 100px;
   }
   
   /* Better spacing for desktop cards */
   .desktop-card {
-    padding: 1.5rem;
+    padding: 1rem;
   }
 }
 
 /* Large desktop optimizations */
 @media (min-width: 1440px) {
   .chess-board-container {
-    max-height: calc(100vh - 180px);
+    max-height: calc(100vh - 160px);
   }
 }
 
 /* Ultra-wide desktop optimizations */
 @media (min-width: 1920px) {
   .chess-board-container {
-    max-height: calc(100vh - 160px);
+    max-height: calc(100vh - 140px);
   }
 }
 
@@ -508,10 +515,10 @@ html, body {
 /* Fix for very small screens */
 @media (max-width: 360px) {
   .chess-board-container {
-    width: calc(100vw - 32px) !important;
-    height: calc(100vw - 32px) !important;
-    max-width: 280px;
-    max-height: 280px;
+    width: calc(100vw - 24px) !important;
+    height: calc(100vw - 24px) !important;
+    max-width: 300px;
+    max-height: calc(100vh - 500px);
   }
 
   .btn {
@@ -520,9 +527,14 @@ html, body {
   }
 
   .progress-cell {
-    width: 0.75rem;
-    height: 0.75rem;
+    width: 0.875rem;
+    height: 0.875rem;
     font-size: 0.5rem;
-    min-width: 12px;
+    min-width: 14px;
+  }
+
+  .card {
+    margin: 0.125rem;
+    padding: 0.5rem;
   }
 }
