@@ -10,18 +10,24 @@ interface HintComponentProps {
 
 export function HintComponent({ onShowHint, hintsUsed, isCompleted, className = '' }: HintComponentProps) {
   return (
-    <div className={`card p-3 sm:p-4 ${className}`}>
-      <button
-        onClick={onShowHint}
-        className="btn-secondary w-full flex items-center justify-center gap-2 px-4 py-2.5 sm:py-3 transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-        disabled={isCompleted}
-        aria-label={`Get hint${hintsUsed > 0 ? ` (${hintsUsed} used)` : ''}`}
-      >
-        <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5" />
-        <span className="text-sm sm:text-base font-medium">
-          Hint{hintsUsed > 0 && ` (${hintsUsed})`}
-        </span>
-      </button>
+    <div className={`card p-4 ${className}`}>
+      <div className="text-center">
+        <h3 className="text-lg font-semibold mb-3 flex items-center justify-center gap-2" style={{ color: 'var(--color-text)' }}>
+          <Lightbulb className="w-5 h-5 text-yellow-400" />
+          Need Help?
+        </h3>
+        <p className="text-sm mb-4" style={{ color: 'var(--color-text-muted)' }}>
+          Get a hint to see the next move or piece to move
+        </p>
+        <button
+          onClick={onShowHint}
+          className="btn-secondary w-full flex items-center justify-center gap-2 px-6 py-3"
+          disabled={isCompleted}
+        >
+          <Lightbulb className="w-4 h-4" />
+          <span>Get Hint {hintsUsed > 0 && `(${hintsUsed} used)`}</span>
+        </button>
+      </div>
     </div>
   );
 }
