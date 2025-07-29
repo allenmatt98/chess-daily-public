@@ -672,7 +672,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   return (
     <div className="w-full">
       {/* Mobile Layout - Stack vertically */}
-      <div className="lg:hidden space-y-3 px-2">
+      <div className="lg:hidden space-y-2 sm:space-y-3 px-1 sm:px-2">
         {/* Puzzle Header */}
         <PuzzleHeader
           puzzleNumber={puzzle.metadata?.absolute_number || 1}
@@ -684,8 +684,8 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         />
 
         {/* Chess board */}
-        <div className="flex justify-center px-1">
-          <div className="chess-board-wrapper p-2 rounded-xl w-full max-w-sm" style={{ 
+        <div className="flex justify-center px-0 sm:px-1">
+          <div className="chess-board-wrapper p-1 sm:p-2 rounded-xl w-full max-w-xs sm:max-w-sm" style={{ 
             backgroundColor: 'var(--color-surface)',
             border: '1px solid var(--color-border)'
           }}>
@@ -714,16 +714,16 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         />
 
         {/* Progress Grid */}
-        <div className="card p-3">
-          <div className="flex items-center gap-2 mb-4">
-            <Target className="w-5 h-5 text-green-400" />
-            <h3 className="text-base font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
+        <div className="card p-2 sm:p-3 mx-1 sm:mx-0">
+          <div className="flex items-center gap-1 sm:gap-2 mb-2 sm:mb-4">
+            <Target className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
+            <h3 className="text-sm sm:text-base font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
           </div>
           {renderProgressGrid()}
         </div>
 
         {/* Stats/Auth section for mobile */}
-        <div className="mt-3">
+        <div className="mt-2 sm:mt-3 mx-1 sm:mx-0">
           {user ? (
             <UserStats {...currentStats} />
           ) : (
@@ -733,10 +733,10 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       </div>
 
       {/* Desktop Layout - Side by side */}
-      <div className="hidden lg:grid lg:grid-cols-12 lg:gap-4 xl:gap-6 lg:px-4">
+      <div className="hidden lg:grid lg:grid-cols-12 lg:gap-3 xl:gap-4 lg:px-2 xl:px-4">
         {/* Left Column - Chess board */}
-        <div className="lg:col-span-8 xl:col-span-8">
-          <div className="space-y-3">
+        <div className="lg:col-span-7 xl:col-span-8">
+          <div className="space-y-2 lg:space-y-3">
             {/* Puzzle Header for Desktop */}
             <PuzzleHeader
               puzzleNumber={puzzle.metadata?.absolute_number || 1}
@@ -749,7 +749,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
             
             {/* Chess Board */}
             <div className="flex justify-center">
-              <div className="chess-board-wrapper p-3 rounded-xl" style={{ 
+              <div className="chess-board-wrapper p-2 lg:p-3 rounded-xl" style={{ 
                 backgroundColor: 'var(--color-surface)',
                 border: '1px solid var(--color-border)'
               }}>
@@ -780,7 +780,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         </div>
 
         {/* Right Sidebar */}
-        <div className="lg:col-span-4 xl:col-span-4 space-y-3">
+        <div className="lg:col-span-5 xl:col-span-4 space-y-2 lg:space-y-3">
           {/* User Stats */}
           {user ? (
             <UserStats {...currentStats} />
@@ -789,10 +789,10 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           )}
 
           {/* Progress Section */}
-          <div className="card p-4">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="card p-3 lg:p-4">
+            <div className="flex items-center gap-2 mb-3 lg:mb-4">
               <Target className="w-5 h-5 text-green-400" />
-              <h3 className="text-base font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
+              <h3 className="text-sm lg:text-base font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
             </div>
             {renderProgressGrid()}
           </div>

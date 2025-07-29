@@ -43,9 +43,16 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-1 sm:gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 border-0;
-    min-height: 36px;
-    font-size: 0.875rem;
+    @apply inline-flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 border-0;
+    min-height: 32px;
+    font-size: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .btn {
+      min-height: 36px;
+      font-size: 0.875rem;
+    }
   }
 
   .btn-primary {
@@ -65,7 +72,7 @@
   }
 
   .card {
-    @apply rounded-xl shadow-lg transition-all duration-300 border;
+    @apply rounded-lg sm:rounded-xl shadow-lg transition-all duration-300 border;
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
   }
@@ -92,7 +99,7 @@
 
   .chess-board-container {
     @apply relative mx-auto;
-    border-radius: 8px;
+    border-radius: 6px;
     transition: all 0.3s ease;
     /* Prevent accidental moves on mobile scroll */
     touch-action: none;
@@ -104,7 +111,14 @@
     user-select: none;
     /* Ensure board fits properly on all screen sizes */
     max-width: 100%;
-    max-height: calc(100vh - 300px);
+    max-height: calc(100vh - 280px);
+  }
+
+  @media (max-width: 640px) {
+    .chess-board-container {
+      max-height: calc(100vh - 320px);
+      border-radius: 4px;
+    }
   }
 
   .progress-grid {
@@ -114,11 +128,25 @@
   }
 
   .progress-cell {
-    @apply w-5 h-5 sm:w-6 sm:h-6 rounded flex items-center justify-center text-xs sm:text-sm font-medium transition-all duration-200;
+    @apply w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 rounded flex items-center justify-center text-xs font-medium transition-all duration-200;
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
-    min-width: 24px;
+    min-width: 16px;
     flex-shrink: 0;
+  }
+
+  @media (min-width: 640px) {
+    .progress-cell {
+      min-width: 20px;
+      font-size: 0.75rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .progress-cell {
+      min-width: 24px;
+      font-size: 0.875rem;
+    }
   }
 
   /* Clean progress cell styles without thick borders - ALL COLORS FIXED */
@@ -152,27 +180,64 @@
   }
 
   .stat-card {
-    @apply rounded-lg p-3 transition-all duration-300;
+    @apply rounded-lg p-2 sm:p-3 transition-all duration-300;
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
   }
 
   .stat-value {
-    @apply text-lg font-bold text-green-400;
+    @apply text-sm sm:text-base lg:text-lg font-bold text-green-400;
   }
 
   .stat-label {
-    @apply text-sm font-medium;
+    @apply text-xs sm:text-sm font-medium;
     color: var(--color-text-muted);
   }
 
   /* Responsive grid adjustments */
   @media (max-width: 640px) {
     .progress-grid {
-      gap: 0.25rem;
+      gap: 0.125rem;
     }
     .progress-cell {
-      min-width: 20px;
+      min-width: 14px;
+      width: 0.875rem;
+      height: 0.875rem;
+      font-size: 0.625rem;
+    }
+  }
+
+  /* Extra small screens (Galaxy 24 and similar) */
+  @media (max-width: 400px) {
+    .card {
+      margin: 0.125rem;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+    }
+
+    .btn {
+      min-height: 28px;
+      font-size: 0.625rem;
+      padding: 0.25rem 0.5rem;
+    }
+
+    .progress-cell {
+      width: 0.75rem;
+      height: 0.75rem;
+      min-width: 12px;
+      font-size: 0.5rem;
+    }
+
+    .stat-value {
+      font-size: 0.75rem;
+    }
+
+    .stat-label {
+      font-size: 0.625rem;
+    }
+
+    .chess-board-container {
+      max-height: calc(100vh - 360px);
     }
   }
 }
