@@ -121,16 +121,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   };
 
   const currentStats = getCurrentStats();
-    } else if (screenWidth >= 768) {
-      return Math.min(650, Math.max(500, screenWidth * 0.55));
-    } else if (screenWidth >= 640) {
-      return Math.min(600, Math.max(450, screenWidth * 0.60));
-    } else if (screenWidth >= 480) {
-      return Math.min(550, Math.max(400, screenWidth * 0.65));
-    } else {
-      return Math.min(500, Math.max(350, screenWidth * 0.75));
-    }
-  };
 
   const [boardWidth, setBoardWidth] = useState(getBoardWidth());
 
@@ -740,7 +730,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
             <AuthPrompt onSignIn={() => setShowAuthModal(true)} />
           )}
         </div>
-        </div>
+      </div>
 
       {/* Desktop Layout - Side by side */}
       <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 xl:gap-8">
@@ -805,98 +795,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
               <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
             </div>
             {renderProgressGrid()}
-          </div>
-        </div>
-      </div>
-
-      {/* Victory celebration - rendered at top level */}
-      {showVictory && victoryStats && (
-        <VictoryCelebration
-          elapsedTime={finalTimeRef.current}
-          onComplete={() => setShowVictory(false)}
-          rating={victoryStats.rating}
-          ratingChange={victoryStats.ratingChange}
-          streak={victoryStats.streak}
-          shareGridData={generateShareGrid()}
-        />
-      )}
-    </div>
-  );
-}
-              backgroundColor: 'var(--color-surface)',
-              border: '1px solid var(--color-border)'
-            }}>
-              <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`}>
-                <Chessboard
-                  position={game.fen()}
-                  onPieceDrop={handleMove}
-                  onPromotionPieceSelect={handlePromotion}
-                  boardOrientation={playerColor}
-                  customBoardStyle={{ borderRadius: '8px' }}
-                  customDarkSquareStyle={{ backgroundColor: isDarkMode ? '#475569' : '#64748b' }}
-                  customLightSquareStyle={{ backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9' }}
-                  customSquareStyles={getSquareStyles()}
-                  showBoardNotation={true}
-                  boardWidth={boardWidth}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Right sidebar */}
-          <div className="w-80 flex-shrink-0 space-y-6">
-            {/* Puzzle info */}
-            <div className="card p-6">
-              <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
-                Puzzle #{puzzle.metadata?.absolute_number || 1}
-              </h1>
-              <p className="text-lg" style={{ color: 'var(--color-text-muted)' }}>{puzzleObjective}</p>
-            </div>
-
-            {/* Timer and stats */}
-            <div className="card p-6">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="flex items-center gap-3 px-4 py-3 rounded-lg border" style={{ 
-                  backgroundColor: 'var(--color-surface)',
-                  borderColor: 'var(--color-border)'
-                }}>
-                  <Clock className="w-5 h-5 text-green-400" />
-                  <span className="font-mono text-xl" style={{ color: 'var(--color-text)' }}>{formatTime(elapsedTime)}</span>
-                </div>
-              </div>
-              
-              {hintsUsed > 0 && (
-                <div className="flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500/20 border border-yellow-500/30 rounded-lg mb-4">
-                  <Lightbulb className="w-4 h-4 text-yellow-400" />
-                  <span className="text-yellow-300 font-medium">{hintsUsed} hints used</span>
-                </div>
-              )}
-
-              <div className="w-full rounded-full h-3 mb-4" style={{ backgroundColor: 'var(--color-border)' }}>
-                <div 
-                  className="bg-gradient-to-r from-green-500 to-green-400 h-3 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${progressPercentage}%` }}
-                ></div>
-              </div>
-
-              <button
-                onClick={showHint}
-                className="btn-secondary w-full flex items-center justify-center gap-2 px-6 py-3"
-                disabled={isCompleted}
-              >
-                <Lightbulb className="w-4 h-4" />
-                <span>Hint {hintsUsed > 0 && `(${hintsUsed})`}</span>
-              </button>
-            </div>
-
-            {/* Progress section */}
-            <div className="card p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Target className="w-5 h-5 text-green-400" />
-                <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
-              </div>
-              {renderProgressGrid()}
-            </div>
           </div>
         </div>
       </div>
