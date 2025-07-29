@@ -683,11 +683,12 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           formatTime={formatTime}
         />
 
-        {/* Chess board */}
-        <div className="flex justify-center px-0 sm:px-1">
-          <div className="chess-board-wrapper p-1 sm:p-2 rounded-xl w-full max-w-xs sm:max-w-sm" style={{ 
+        {/* Chess board container with proper spacing */}
+        <div className="flex justify-center px-1 sm:px-2">
+          <div className="chess-board-wrapper p-2 sm:p-3 rounded-xl w-full" style={{ 
             backgroundColor: 'var(--color-surface)',
-            border: '1px solid var(--color-border)'
+            border: '1px solid var(--color-border)',
+            maxWidth: 'min(calc(100vw - 16px), 400px)' // Ensure board never exceeds viewport
           }}>
             <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`}>
               <Chessboard
