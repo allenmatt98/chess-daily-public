@@ -11,7 +11,7 @@ interface HintComponentProps {
 export function HintComponent({ onShowHint, hintsUsed, isCompleted, className = '' }: HintComponentProps) {
   return (
     <div className={`card p-2 sm:p-3 mx-0 sm:mx-0 ${className}`} style={{
-      marginTop: '0.5rem', // Reduced spacing from chess board
+      marginTop: '0.75rem', // Increased spacing from chess board
       marginBottom: '0.5rem'
     }}>
       <div className="text-center">

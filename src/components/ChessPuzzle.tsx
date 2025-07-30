@@ -90,6 +90,13 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     const aspectRatio = screenWidth / screenHeight;
     const padding = 16; // Reduced padding for better space utilization
     
+    // Calculate available height for the board
+    const headerHeight = 56; // Approximate header height
+    const statusBarHeight = 47; // iPhone status bar height
+    const homeIndicatorHeight = 34; // iPhone home indicator
+    const otherComponentsHeight = 200; // Approximate space for other components
+    const availableHeight = screenHeight - headerHeight - statusBarHeight - homeIndicatorHeight - otherComponentsHeight;
+    
     // Desktop/Laptop sizes
     if (screenWidth >= 1920) {
       return Math.min(600, screenWidth * 0.35);
@@ -102,22 +109,36 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     else if (screenWidth >= 768) {
       return Math.min(screenWidth - padding * 2, 480);
     }
+    // iPhone 15 and similar devices - more conservative sizing
+    else if (screenWidth >= 400 && screenWidth <= 430) {
+      const maxWidth = Math.min(screenWidth - padding * 2, screenWidth - 32);
+      const maxHeight = Math.max(availableHeight, 300); // Ensure minimum height
+      return Math.min(maxWidth, maxHeight);
+    }
     // Large mobile phones (1080x2400, 1440x3200, etc.)
     else if (screenWidth >= 400 && aspectRatio < 0.5) {
-      // Very tall screens - use more width
-      return Math.min(screenWidth - padding * 2, screenWidth - 16);
+      // Very tall screens - use more width but respect height constraints
+      const maxWidth = Math.min(screenWidth - padding * 2, screenWidth - 16);
+      const maxHeight = Math.max(availableHeight, 280);
+      return Math.min(maxWidth, maxHeight);
     }
-    // Standard mobile sizes - iPhone 15, Galaxy 24 and similar
+    // Standard mobile sizes - Galaxy 24 and similar
     else if (screenWidth >= 400) {
-      return Math.min(screenWidth - padding * 2, screenWidth - 24);
+      const maxWidth = Math.min(screenWidth - padding * 2, screenWidth - 24);
+      const maxHeight = Math.max(availableHeight, 320);
+      return Math.min(maxWidth, maxHeight);
     }
     // Small mobile
     else if (screenWidth >= 360) {
-      return Math.min(screenWidth - padding * 2, screenWidth - 20);
+      const maxWidth = Math.min(screenWidth - padding * 2, screenWidth - 20);
+      const maxHeight = Math.max(availableHeight, 280);
+      return Math.min(maxWidth, maxHeight);
     }
     // Very small mobile
     else {
-      return Math.min(screenWidth - padding * 2, screenWidth - 12);
+      const maxWidth = Math.min(screenWidth - padding * 2, screenWidth - 12);
+      const maxHeight = Math.max(availableHeight, 260);
+      return Math.min(maxWidth, maxHeight);
     }
   };
 
@@ -686,7 +707,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   return (
     <div className="w-full">
       {/* Mobile Layout - Stack vertically */}
-      <div className="lg:hidden space-y-2 sm:space-y-3 px-1 sm:px-2">
+      <div className="lg:hidden space-y-3 sm:space-y-4 px-1 sm:px-2">
         {/* Puzzle Header */}
         <PuzzleHeader
           puzzleNumber={puzzle.metadata?.absolute_number || 1}
@@ -698,11 +719,12 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         />
 
         {/* Chess board container with proper spacing */}
-        <div className="flex justify-center px-0 sm:px-1">
+        <div className="flex justify-center px-0 sm:px-1 mb-2 sm:mb-3">
           <div className="chess-board-wrapper p-1 sm:p-2 rounded-xl w-full" style={{ 
             backgroundColor: 'var(--color-surface)',
             border: '1px solid var(--color-border)',
-            maxWidth: 'min(calc(100vw - 16px), 100%)' // Use more of the available width
+            maxWidth: 'min(calc(100vw - 16px), 100%)', // Use more of the available width
+            maxHeight: 'calc(100vh - 400px)' // Ensure board doesn't exceed viewport
           }}>
             <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`}>
               <Chessboard
