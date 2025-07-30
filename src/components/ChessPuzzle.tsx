@@ -707,8 +707,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
                 customDarkSquareStyle={{ backgroundColor: isDarkMode ? '#475569' : '#64748b' }}
                 customLightSquareStyle={{ backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9' }}
                 customSquareStyles={getSquareStyles()}
-                showBoardNotation={boardWidth > 280}
-                boardWidth={boardWidth}
+                showBoardNotation={true}
               />
             </div>
           </div>
@@ -786,7 +785,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
                     customLightSquareStyle={{ backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9' }}
                     customSquareStyles={getSquareStyles()}
                     showBoardNotation={true}
-                    boardWidth={boardWidth}
                   />
                 </div>
               </div>
