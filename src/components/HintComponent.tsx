@@ -10,14 +10,14 @@ interface HintComponentProps {
 
 export function HintComponent({ onShowHint, hintsUsed, isCompleted, className = '' }: HintComponentProps) {
   return (
-    <div className={`card p-3 sm:p-4 mx-1 sm:mx-0 ${className}`} style={{
-      marginTop: '0.75rem', // Ensure proper spacing from chess board
-      marginBottom: '0.75rem'
+    <div className={`card p-2 sm:p-3 mx-0 sm:mx-0 ${className}`} style={{
+      marginTop: '0.5rem', // Reduced spacing from chess board
+      marginBottom: '0.5rem'
     }}>
       <div className="text-center">
         <button
           onClick={onShowHint}
-          className="btn-secondary w-auto mx-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base min-h-[40px] sm:min-h-[44px]"
+          className="btn-secondary w-auto mx-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-2.5 text-sm sm:text-base min-h-[40px] sm:min-h-[44px]"
           disabled={isCompleted}
           style={{
             minWidth: '140px', // Ensure button is always visible and clickable

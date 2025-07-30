@@ -270,7 +270,7 @@ function App() {
           </div>
 
           {/* Hidden Gems Section */}
-          <div className="mt-4 sm:mt-6 lg:mt-8">
+          <div className="mt-3 sm:mt-4 lg:mt-6">
             <HiddenGemsSection />
           </div>
         </main>
