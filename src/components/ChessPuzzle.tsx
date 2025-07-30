@@ -87,59 +87,18 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     if (typeof window === 'undefined') return 300;
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
-    const aspectRatio = screenWidth / screenHeight;
-    const padding = 16; // Reduced padding for better space utilization
     
-    // Calculate available height for the board
-    const headerHeight = 56; // Approximate header height
-    const statusBarHeight = 47; // iPhone status bar height
-    const homeIndicatorHeight = 34; // iPhone home indicator
-    const otherComponentsHeight = 200; // Approximate space for other components
-    const availableHeight = screenHeight - headerHeight - statusBarHeight - homeIndicatorHeight - otherComponentsHeight;
+    // Universal calculation that works for all screen sizes
+    const containerPadding = 32; // Total padding for container
+    const boardPadding = 16; // Padding inside board wrapper
+    const availableWidth = screenWidth - containerPadding;
+    const availableHeight = screenHeight - 400; // Reserve space for other components
     
-    // Desktop/Laptop sizes
-    if (screenWidth >= 1920) {
-      return Math.min(600, screenWidth * 0.35);
-    } else if (screenWidth >= 1440) {
-      return Math.min(550, screenWidth * 0.38);
-    } else if (screenWidth >= 1024) {
-      return Math.min(500, screenWidth * 0.45);
-    }
-    // Tablet sizes
-    else if (screenWidth >= 768) {
-      return Math.min(screenWidth - padding * 2, 480);
-    }
-    // iPhone 15 and similar devices - more conservative sizing
-    else if (screenWidth >= 400 && screenWidth <= 430) {
-      const maxWidth = Math.min(screenWidth - padding * 2, screenWidth - 32);
-      const maxHeight = Math.max(availableHeight, 300); // Ensure minimum height
-      return Math.min(maxWidth, maxHeight);
-    }
-    // Large mobile phones (1080x2400, 1440x3200, etc.)
-    else if (screenWidth >= 400 && aspectRatio < 0.5) {
-      // Very tall screens - use more width but respect height constraints
-      const maxWidth = Math.min(screenWidth - padding * 2, screenWidth - 16);
-      const maxHeight = Math.max(availableHeight, 280);
-      return Math.min(maxWidth, maxHeight);
-    }
-    // Standard mobile sizes - Galaxy 24 and similar
-    else if (screenWidth >= 400) {
-      const maxWidth = Math.min(screenWidth - padding * 2, screenWidth - 24);
-      const maxHeight = Math.max(availableHeight, 320);
-      return Math.min(maxWidth, maxHeight);
-    }
-    // Small mobile
-    else if (screenWidth >= 360) {
-      const maxWidth = Math.min(screenWidth - padding * 2, screenWidth - 20);
-      const maxHeight = Math.max(availableHeight, 280);
-      return Math.min(maxWidth, maxHeight);
-    }
-    // Very small mobile
-    else {
-      const maxWidth = Math.min(screenWidth - padding * 2, screenWidth - 12);
-      const maxHeight = Math.max(availableHeight, 260);
-      return Math.min(maxWidth, maxHeight);
-    }
+    // Calculate optimal board size
+    const maxBoardSize = Math.min(availableWidth, availableHeight, 500);
+    const optimalSize = Math.max(maxBoardSize, 280); // Minimum size
+    
+    return Math.min(optimalSize, availableWidth - boardPadding);
   };
 
   // Get current user stats for display
@@ -156,24 +115,17 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
 
   const [boardWidth, setBoardWidth] = useState(getBoardWidth());
 
-  // Enhanced resize handler with debouncing
+  // Stable resize handler - only triggers on actual window resize, not scroll
   useEffect(() => {
     const handleResize = () => {
       const newWidth = getBoardWidth();
       setBoardWidth(newWidth);
     };
 
-    // Debounce resize events
-    let timeoutId: number;
-    const debouncedResize = () => {
-      clearTimeout(timeoutId);
-      timeoutId = window.setTimeout(handleResize, 100);
-    };
-
-    window.addEventListener('resize', debouncedResize);
+    // Only trigger on window resize, not scroll events
+    window.addEventListener('resize', handleResize);
     return () => {
-      window.removeEventListener('resize', debouncedResize);
-      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -666,11 +618,20 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     const numUserMoves = userMoveIndexes.length;
     const maxRows = Math.max(...cappedHistory.map(col => col.length), 1);
     
+    // Adaptive spacing based on number of columns
+    const getAdaptiveGap = () => {
+      if (numUserMoves <= 3) return '0.25rem'; // Mate in 3 - more spacing
+      if (numUserMoves <= 4) return '0.125rem'; // Mate in 4 - medium spacing
+      return '0.0625rem'; // More than 4 - minimal spacing
+    };
+    
     return (
       <div className="flex flex-col items-center w-full">
-        <div className="progress-grid overflow-x-auto max-w-full w-full" style={{ 
+        <div className="progress-grid overflow-x-auto max-w-full w-full flex justify-center" style={{ 
           gridTemplateColumns: `repeat(${numUserMoves}, 1fr)`,
-          gap: '0.125rem'
+          gap: getAdaptiveGap(),
+          maxWidth: 'fit-content',
+          margin: '0 auto'
         }}>
           {Array.from({ length: numUserMoves }).map((_, colIdx) => (
             <div key={colIdx} className="flex flex-col gap-0.5 min-w-0">
@@ -718,21 +679,31 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           formatTime={formatTime}
         />
 
-        {/* Chess board container with proper spacing */}
-        <div className="flex justify-center px-0 sm:px-1 mb-2 sm:mb-3">
-          <div className="chess-board-wrapper p-1 sm:p-2 rounded-xl w-full" style={{ 
+        {/* Chess board container with universal responsive design */}
+        <div className="flex justify-center items-center px-2 sm:px-3 mb-3 sm:mb-4">
+          <div className="chess-board-wrapper rounded-xl flex justify-center items-center" style={{ 
             backgroundColor: 'var(--color-surface)',
             border: '1px solid var(--color-border)',
-            maxWidth: 'min(calc(100vw - 16px), 100%)', // Use more of the available width
-            maxHeight: 'calc(100vh - 400px)' // Ensure board doesn't exceed viewport
+            width: '100%',
+            maxWidth: 'min(calc(100vw - 32px), 500px)',
+            aspectRatio: '1',
+            padding: '0.5rem'
           }}>
-            <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`}>
+            <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`} style={{
+              width: '100%',
+              height: '100%',
+              maxWidth: '100%',
+              maxHeight: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
               <Chessboard
                 position={game.fen()}
                 onPieceDrop={handleMove}
                 onPromotionPieceSelect={handlePromotion}
                 boardOrientation={playerColor}
-                customBoardStyle={{ borderRadius: '8px' }}
+                customBoardStyle={{ borderRadius: '8px', width: '100%', height: '100%' }}
                 customDarkSquareStyle={{ backgroundColor: isDarkMode ? '#475569' : '#64748b' }}
                 customLightSquareStyle={{ backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9' }}
                 customSquareStyles={getSquareStyles()}
@@ -756,7 +727,9 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
             <Target className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
             <h3 className="text-sm sm:text-base font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
           </div>
-          {renderProgressGrid()}
+          <div className="flex justify-center w-full">
+            {renderProgressGrid()}
+          </div>
         </div>
 
         {/* Stats/Auth section for mobile */}
@@ -785,18 +758,30 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
             />
             
             {/* Chess Board */}
-            <div className="flex justify-center">
-              <div className="chess-board-wrapper p-2 lg:p-3 rounded-xl" style={{ 
+            <div className="flex justify-center items-center">
+              <div className="chess-board-wrapper rounded-xl flex justify-center items-center" style={{ 
                 backgroundColor: 'var(--color-surface)',
-                border: '1px solid var(--color-border)'
+                border: '1px solid var(--color-border)',
+                width: '100%',
+                maxWidth: '500px',
+                aspectRatio: '1',
+                padding: '1rem'
               }}>
-                <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`}>
+                <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`} style={{
+                  width: '100%',
+                  height: '100%',
+                  maxWidth: '100%',
+                  maxHeight: '100%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
                   <Chessboard
                     position={game.fen()}
                     onPieceDrop={handleMove}
                     onPromotionPieceSelect={handlePromotion}
                     boardOrientation={playerColor}
-                    customBoardStyle={{ borderRadius: '8px' }}
+                    customBoardStyle={{ borderRadius: '8px', width: '100%', height: '100%' }}
                     customDarkSquareStyle={{ backgroundColor: isDarkMode ? '#475569' : '#64748b' }}
                     customLightSquareStyle={{ backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9' }}
                     customSquareStyles={getSquareStyles()}

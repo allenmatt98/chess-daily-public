@@ -262,7 +262,7 @@ function App() {
           }
         />
         <main className="flex-1 main-content">
-          <div className="mt-1 sm:mt-2 lg:mt-4">
+          <div className="mt-1 sm:mt-2 lg:mt-4 mobile-layout">
             <ChessPuzzle 
               puzzle={puzzleData}
               onComplete={handlePuzzleComplete}
