@@ -217,9 +217,9 @@ function App() {
           onSignOut={() => { useAuthStore.getState().signOut(); }}
           onLogoClick={() => navigate('/')}
           leftActions={
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <button
-                className="px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 border"
+                className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg font-medium text-xs sm:text-sm transition-all duration-200 border whitespace-nowrap"
                 style={{
                   backgroundColor: 'var(--color-surface)',
                   borderColor: 'var(--color-border)',
@@ -235,10 +235,11 @@ function App() {
                 }}
                 onClick={() => navigate('/historical-puzzles')}
               >
-                Puzzle Archives
+                <span className="hidden sm:inline">Puzzle Archives</span>
+                <span className="sm:hidden">Archives</span>
               </button>
               <button
-                className="px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 border"
+                className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg font-medium text-xs sm:text-sm transition-all duration-200 border whitespace-nowrap"
                 style={{
                   backgroundColor: 'var(--color-surface)',
                   borderColor: 'var(--color-border)',
@@ -254,13 +255,14 @@ function App() {
                 }}
                 onClick={() => navigate('/articles')}
               >
-                Chess Stories
+                <span className="hidden sm:inline">Chess Stories</span>
+                <span className="sm:hidden">Stories</span>
               </button>
             </div>
           }
         />
         <main className="flex-1 main-content">
-          <div className="mt-2 sm:mt-4 lg:mt-6">
+          <div className="mt-1 sm:mt-2 lg:mt-4">
             <ChessPuzzle 
               puzzle={puzzleData}
               onComplete={handlePuzzleComplete}
@@ -268,7 +270,7 @@ function App() {
           </div>
 
           {/* Hidden Gems Section */}
-          <div className="mt-6 sm:mt-8 lg:mt-12">
+          <div className="mt-4 sm:mt-6 lg:mt-8">
             <HiddenGemsSection />
           </div>
         </main>

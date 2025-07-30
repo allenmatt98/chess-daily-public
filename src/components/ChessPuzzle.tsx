@@ -86,7 +86,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   const getBoardWidth = () => {
     if (typeof window === 'undefined') return 300;
     const screenWidth = window.innerWidth;
-    const padding = 16; // Account for container padding
+    const padding = 24; // Increased padding for better mobile spacing
     
     // Desktop/Laptop sizes
     if (screenWidth >= 1920) {
@@ -102,11 +102,15 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     }
     // Mobile sizes - Galaxy 24 and similar
     else if (screenWidth >= 400) {
-      return Math.min(screenWidth - padding * 2, 380);
+      return Math.min(screenWidth - padding * 2, 360);
     }
     // Small mobile
-    else {
+    else if (screenWidth >= 360) {
       return Math.min(screenWidth - padding * 2, 320);
+    }
+    // Very small mobile
+    else {
+      return Math.min(screenWidth - padding * 2, 280);
     }
   };
 
@@ -636,7 +640,10 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     
     return (
       <div className="flex flex-col items-center w-full">
-        <div className="progress-grid overflow-x-auto max-w-full" style={{ gridTemplateColumns: `repeat(${numUserMoves}, 1fr)` }}>
+        <div className="progress-grid overflow-x-auto max-w-full w-full" style={{ 
+          gridTemplateColumns: `repeat(${numUserMoves}, 1fr)`,
+          gap: '0.25rem'
+        }}>
           {Array.from({ length: numUserMoves }).map((_, colIdx) => (
             <div key={colIdx} className="flex flex-col gap-1 min-w-0">
               {Array.from({ length: maxRows }).map((_, rowIdx) => {
@@ -672,7 +679,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   return (
     <div className="w-full">
       {/* Mobile Layout - Stack vertically */}
-      <div className="lg:hidden space-y-2 sm:space-y-3 px-1 sm:px-2">
+      <div className="lg:hidden space-y-3 sm:space-y-4 px-2 sm:px-3">
         {/* Puzzle Header */}
         <PuzzleHeader
           puzzleNumber={puzzle.metadata?.absolute_number || 1}
@@ -688,7 +695,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           <div className="chess-board-wrapper p-2 sm:p-3 rounded-xl w-full" style={{ 
             backgroundColor: 'var(--color-surface)',
             border: '1px solid var(--color-border)',
-            maxWidth: 'min(calc(100vw - 16px), 400px)' // Ensure board never exceeds viewport
+            maxWidth: 'min(calc(100vw - 32px), 400px)' // Ensure board never exceeds viewport
           }}>
             <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`}>
               <Chessboard
@@ -715,8 +722,8 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         />
 
         {/* Progress Grid */}
-        <div className="card p-2 sm:p-3 mx-1 sm:mx-0">
-          <div className="flex items-center gap-1 sm:gap-2 mb-2 sm:mb-4">
+        <div className="card p-3 sm:p-4 mx-1 sm:mx-0">
+          <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
             <Target className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
             <h3 className="text-sm sm:text-base font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
           </div>
@@ -724,7 +731,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
         </div>
 
         {/* Stats/Auth section for mobile */}
-        <div className="mt-2 sm:mt-3 mx-1 sm:mx-0">
+        <div className="mt-3 sm:mt-4 mx-1 sm:mx-0">
           {user ? (
             <UserStats {...currentStats} />
           ) : (
