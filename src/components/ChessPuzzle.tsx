@@ -679,7 +679,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           formatTime={formatTime}
         />
 
-        {/* Chess board container with universal responsive design */}
+        {/* Chess board container with mobile-optimized design */}
         <div className="flex justify-center items-center px-2 sm:px-3 mb-3 sm:mb-4">
           <div className="chess-board-wrapper rounded-xl flex justify-center items-center" style={{ 
             backgroundColor: 'var(--color-surface)',
@@ -707,8 +707,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
                 customDarkSquareStyle={{ backgroundColor: isDarkMode ? '#475569' : '#64748b' }}
                 customLightSquareStyle={{ backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9' }}
                 customSquareStyles={getSquareStyles()}
-                showBoardNotation={boardWidth > 280}
-                boardWidth={boardWidth}
+                showBoardNotation={true}
               />
             </div>
           </div>
