@@ -671,7 +671,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       <div className="lg:hidden space-y-3 sm:space-y-4 px-1 sm:px-2">
         {/* Puzzle Header */}
         <PuzzleHeader
-          puzzleNumber={puzzle.metadata?.absolute_number || 1}
+          puzzleNumber={puzzle.absolute_number || puzzle.metadata?.absolute_number || 1}
           objective={puzzleObjective}
           elapsedTime={elapsedTime}
           hintsUsed={hintsUsed}
@@ -748,7 +748,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           <div className="space-y-2 lg:space-y-3">
             {/* Puzzle Header for Desktop */}
             <PuzzleHeader
-              puzzleNumber={puzzle.metadata?.absolute_number || 1}
+              puzzleNumber={puzzle.absolute_number || puzzle.metadata?.absolute_number || 1}
               objective={puzzleObjective}
               elapsedTime={elapsedTime}
               hintsUsed={hintsUsed}
