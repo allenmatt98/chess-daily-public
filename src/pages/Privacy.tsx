@@ -52,6 +52,64 @@ function Privacy() {
             </section>
 
             <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>Advertising and Third-Party Services</h2>
+              <p className="mb-4 leading-relaxed" style={{ color: 'var(--color-text)' }}>
+                We use third-party advertising services, including Google AdSense, to display advertisements on our website. These services may use cookies and similar technologies to serve ads based on your prior visits to our website or other websites on the Internet.
+              </p>
+              
+              <h3 className="text-xl font-semibold mb-3 mt-6" style={{ color: 'var(--color-text)' }}>Google Advertising</h3>
+              <p className="mb-4 leading-relaxed" style={{ color: 'var(--color-text)' }}>
+                Google's use of advertising cookies enables it and its partners to serve ads to our users based on their visits to our sites and/or other sites on the Internet. You may opt out of personalized advertising by visiting{' '}
+                <a 
+                  href="https://www.google.com/settings/ads" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-green-400 hover:text-green-300 transition-colors"
+                >
+                  Google Ads Settings
+                </a>
+                .
+              </p>
+
+              <h3 className="text-xl font-semibold mb-3 mt-6" style={{ color: 'var(--color-text)' }}>Third-Party Vendors and Ad Networks</h3>
+              <p className="mb-4 leading-relaxed" style={{ color: 'var(--color-text)' }}>
+                Other third-party vendors and ad networks may also use cookies to serve ads on our site. You may visit{' '}
+                <a 
+                  href="https://www.aboutads.info" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-green-400 hover:text-green-300 transition-colors"
+                >
+                  www.aboutads.info
+                </a>
+                {' '}to opt out of some third-party vendors' uses of cookies for personalized advertising.
+              </p>
+
+              <h3 className="text-xl font-semibold mb-3 mt-6" style={{ color: 'var(--color-text)' }}>Cookie Management</h3>
+              <p className="mb-4 leading-relaxed" style={{ color: 'var(--color-text)' }}>
+                You can control cookies through your browser settings. For additional guidance on cookie consent and management, please refer to{' '}
+                <a 
+                  href="https://cookiechoices.org" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-green-400 hover:text-green-300 transition-colors"
+                >
+                  cookiechoices.org
+                </a>
+                {' '}and the{' '}
+                <a 
+                  href="https://www.networkadvertising.org" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-green-400 hover:text-green-300 transition-colors"
+                >
+                  Network Advertising Initiative
+                </a>
+                .
+              </p>
+            </section>
+
+            <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--color-text)' }}>Data Security</h2>
               <p className="leading-relaxed" style={{ color: 'var(--color-text)' }}>
                 We implement appropriate security measures to protect your personal information. However, no method of transmission over the Internet is 100% secure. Therefore, while we strive to protect your personal information, we cannot guarantee its absolute security.
