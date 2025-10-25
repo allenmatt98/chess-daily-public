@@ -17,7 +17,7 @@ export function AffiliateBanner({ className = '' }: AffiliateBannerProps) {
         >
           <img 
             style={{ border: '0px' }} 
-            src="https://chess-teacher.com/affiliates/media/banners/Masterclass-728x90.jpg" 
+            src="/affiliate-banners/Masterclass-728x90.jpg" 
             width="728" 
             height="90" 
             alt="Free Chess Masterclass - Improve at Chess Instantly!"
@@ -26,19 +26,19 @@ export function AffiliateBanner({ className = '' }: AffiliateBannerProps) {
         </a>
       </div>
 
-      {/* Desktop Banner - 300x600 - Hidden on mobile */}
+      {/* Desktop Banner - 336x280 - Hidden on mobile */}
       <div className="hidden lg:block">
         <a 
-          href="https://chess-teacher.com/affiliates/idevaffiliate.php?id=2999_125_1_70" 
+          href="https://chess-teacher.com/affiliates/idevaffiliate.php?id=2999_125_1_71" 
           target="_blank" 
           rel="noopener noreferrer"
           className="block"
         >
           <img 
             style={{ border: '0px' }} 
-            src="https://chess-teacher.com/affiliates/media/banners/Masterclass-300x600.jpg" 
-            width="300" 
-            height="600" 
+            src="/affiliate-banners/Masterclass-336x280.jpg" 
+            width="336" 
+            height="280" 
             alt="Free Chess Masterclass - Improve at Chess Instantly!"
             className="w-full h-auto rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
           />

@@ -1019,7 +1019,7 @@ html, body {
 
 @media (min-width: 1024px) {
   .affiliate-banner-container {
-    max-width: 300px;
+    max-width: 336px;
     margin: 0 auto;
   }
 }
