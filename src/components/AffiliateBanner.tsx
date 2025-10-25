@@ -29,7 +29,7 @@ export function AffiliateBanner({ className = '' }: AffiliateBannerProps) {
       {/* Desktop Banner - 336x280 - Hidden on mobile */}
       <div className="hidden lg:block">
         <a 
-          href="https://chess-teacher.com/affiliates/idevaffiliate.php?id=2999_125_1_71" 
+          href="https://chess-teacher.com/affiliates/idevaffiliate.php?id=2999_125_1_70" 
           target="_blank" 
           rel="noopener noreferrer"
           className="block"
