@@ -6,6 +6,7 @@ import { PuzzleHeader } from './PuzzleHeader';
 import { HintComponent } from './HintComponent';
 import { UserStats } from './UserStats';
 import { AuthPrompt } from './AuthPrompt';
+import { AffiliateBanner } from './AffiliateBanner';
 import { useAuthStore } from '../store/authStore';
 import { useTheme } from '../hooks/useTheme';
 import { updateGuestStats } from '../lib/guestStats';
@@ -731,6 +732,11 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           </div>
         </div>
 
+        {/* Affiliate Banner for mobile */}
+        <div className="mt-2 sm:mt-3 mx-0 sm:mx-0">
+          <AffiliateBanner />
+        </div>
+
         {/* Stats/Auth section for mobile */}
         <div className="mt-2 sm:mt-3 mx-0 sm:mx-0">
           {user ? (
@@ -817,6 +823,9 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
             </div>
             {renderProgressGrid()}
           </div>
+
+          {/* Affiliate Banner for Desktop */}
+          <AffiliateBanner />
         </div>
       </div>
 

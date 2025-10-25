@@ -989,6 +989,41 @@ html, body {
   gap: 1rem;
 }
 
+/* Affiliate Banner Styles */
+.affiliate-banner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.affiliate-banner-container img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.affiliate-banner-container img:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive banner sizing */
+@media (max-width: 640px) {
+  .affiliate-banner-container img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .affiliate-banner-container {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+}
+
 @media (max-width: 480px) {
   .mobile-layout {
     gap: 0.75rem;
