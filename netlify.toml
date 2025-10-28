@@ -2,6 +2,14 @@
   command = "npm run build"
   publish = "dist"
 
+# Serve the LinkConnector validation file at root
+[[redirects]]
+  from = "/linkconnector.htm"
+  to = "/linkconnector.htm"
+  status = 200
+  force = true
+
+# SPA fallback - must come after specific routes
 [[redirects]]
   from = "/*"
   to = "/index.html"
