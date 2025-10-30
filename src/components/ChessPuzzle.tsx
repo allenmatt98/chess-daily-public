@@ -771,37 +771,47 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
               formatTime={formatTime}
             />
             
-            {/* Chess Board */}
-            <div className="flex justify-center items-center">
-              <div className="chess-board-wrapper rounded-xl flex justify-center items-center" style={{ 
-                backgroundColor: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
-                width: '100%',
-                maxWidth: '500px',
-                aspectRatio: '1',
-                padding: '1rem'
-              }}>
-                <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`} style={{
+            {/* Board row with left skyscraper ad (desktop only) */}
+            <div className="hidden lg:flex lg:flex-row lg:items-start lg:justify-center lg:gap-4">
+              {/* Left 120x600 banner - desktop only */}
+              <div className="hidden lg:flex justify-center" style={{ width: 120 }}>
+                <div
+                  dangerouslySetInnerHTML={{ __html: '<a href="https://www.linkconnector.com/ta.php?lc=168677162060005057&lcpt=0&lcpf=3" target="_blank"><img src="https://7667.imgix.net/banners/162060.png" border="0" alt="20% off Everything"><img src="https://www.linkconnector.com/tr.php?lc=168677162060005057&tb=1" border="0" width="1" height="1"></a>' }}
+                />
+              </div>
+
+              {/* Chess Board */}
+              <div className="flex justify-center items-center">
+                <div className="chess-board-wrapper rounded-xl flex justify-center items-center" style={{ 
+                  backgroundColor: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
                   width: '100%',
-                  height: '100%',
-                  maxWidth: '100%',
-                  maxHeight: '100%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center'
+                  maxWidth: '500px',
+                  aspectRatio: '1',
+                  padding: '1rem'
                 }}>
-                  <Chessboard
-                    position={game.fen()}
-                    onPieceDrop={handleMove}
-                    onPromotionPieceSelect={handlePromotion}
-                    boardOrientation={playerColor}
-                    customBoardStyle={{ borderRadius: '8px', width: '100%', height: '100%' }}
-                    customDarkSquareStyle={{ backgroundColor: isDarkMode ? '#475569' : '#64748b' }}
-                    customLightSquareStyle={{ backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9' }}
-                    customSquareStyles={getSquareStyles()}
-                    showBoardNotation={true}
-                    boardWidth={boardWidth}
-                  />
+                  <div className={`chess-board-container ${isDarkMode ? 'dark' : ''}`} style={{
+                    width: '100%',
+                    height: '100%',
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                    <Chessboard
+                      position={game.fen()}
+                      onPieceDrop={handleMove}
+                      onPromotionPieceSelect={handlePromotion}
+                      boardOrientation={playerColor}
+                      customBoardStyle={{ borderRadius: '8px', width: '100%', height: '100%' }}
+                      customDarkSquareStyle={{ backgroundColor: isDarkMode ? '#475569' : '#64748b' }}
+                      customLightSquareStyle={{ backgroundColor: isDarkMode ? '#cbd5e1' : '#f1f5f9' }}
+                      customSquareStyles={getSquareStyles()}
+                      showBoardNotation={true}
+                      boardWidth={boardWidth}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
