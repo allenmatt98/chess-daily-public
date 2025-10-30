@@ -732,6 +732,15 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           </div>
         </div>
 
+        {/* Just.com Affiliate Banner (exact HTML injected) */}
+        <div className="mt-2 sm:mt-3 flex justify-center">
+          <div style={{ maxWidth: 225 }} className="w-full flex justify-center">
+            <div
+              dangerouslySetInnerHTML={{ __html: '<a href="https://www.linkconnector.com/ta.php?lc=168677161795005057&lcpt=0&lcpf=3"><img src="https://7667.imgix.net/banners/161795.png" border="0" alt="Back to school 15% off"><img src="https://www.linkconnector.com/tr.php?lc=168677161795005057&tb=1" border="0" width="1" height="1"></a>' }}
+            />
+          </div>
+        </div>
+
         {/* Affiliate Banner for mobile */}
         <div className="mt-2 sm:mt-3 mx-0 sm:mx-0">
           <AffiliateBanner />
@@ -822,6 +831,15 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
               <h3 className="text-sm lg:text-base font-semibold" style={{ color: 'var(--color-text)' }}>Your Progress</h3>
             </div>
             {renderProgressGrid()}
+          </div>
+
+          {/* Just.com Affiliate Banner (exact HTML injected) */}
+          <div className="flex justify-center">
+            <div style={{ maxWidth: 225 }} className="w-full flex justify-center">
+              <div
+                dangerouslySetInnerHTML={{ __html: '<a href="https://www.linkconnector.com/ta.php?lc=168677161795005057&lcpt=0&lcpf=3"><img src="https://7667.imgix.net/banners/161795.png" border="0" alt="Back to school 15% off"><img src="https://www.linkconnector.com/tr.php?lc=168677161795005057&tb=1" border="0" width="1" height="1"></a>' }}
+              />
+            </div>
           </div>
 
           {/* Affiliate Banner for Desktop */}
