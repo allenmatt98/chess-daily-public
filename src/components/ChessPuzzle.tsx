@@ -776,7 +776,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
               {/* Left 120x600 banner - desktop only */}
               <div className="hidden lg:flex justify-center" style={{ width: 120 }}>
                 <div
-                  dangerouslySetInnerHTML={{ __html: '<a href="https://www.linkconnector.com/ta.php?lc=168677162060005057&lcpt=0&lcpf=3" target="_blank"><img src="https://7667.imgix.net/banners/162060.png" border="0" alt="20% off Everything"><img src="https://www.linkconnector.com/tr.php?lc=168677162060005057&tb=1" border="0" width="1" height="1"></a>' }}
+                  dangerouslySetInnerHTML={{ __html: '<a href="https://www.linkconnector.com/ta.php?lc=168677162131005057&lcpt=0&lcpf=3" target="_blank"><img src="https://7667.imgix.net/banners/162131.png" border="0" alt="Thr chess store Fall Sale"><img src="https://www.linkconnector.com/tr.php?lc=168677162131005057&tb=1" border="0" width="1" height="1"></a>' }}
                 />
               </div>
 
