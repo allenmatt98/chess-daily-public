@@ -11,7 +11,7 @@ import { BannerPopup } from './BannerPopup';
 import { useAuthStore } from '../store/authStore';
 import { useTheme } from '../hooks/useTheme';
 import { updateGuestStats } from '../lib/guestStats';
-import { savePuzzleCompletion, getPuzzleCompletion } from '../lib/completionStorage';
+import { savePuzzleCompletion, getPuzzleCompletion, updatePuzzleCompletionStats, VictoryStats } from '../lib/completionStorage';
 import { Target } from 'lucide-react';
 import type { ChessPuzzleProps } from '../types';
 import type { UserStats as UserStatsType } from '../lib/puzzleService';
@@ -61,7 +61,6 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   const [isCompleting, setIsCompleting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [processingVictory, setProcessingVictory] = useState(false);
-  const [victoryShownThisSession, setVictoryShownThisSession] = useState(false);
   
   const startTimeRef = useRef(Date.now());
   const timerIntervalRef = useRef<number>();
@@ -167,21 +166,13 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       setGame(gameCopy);
       setCurrentMoveIndex(completion.moves.length);
       
-      if (!victoryShownThisSession && !sessionStorage.getItem(`victory_shown_${puzzle.id}`)) {
-        setTimeout(() => {
-          if (!user) {
-            const guestStats = updateGuestStats(puzzle.id, completion.timeTaken, completion.hintsUsed);
-            setVictoryStats({
-              rating: guestStats.rating,
-              ratingChange: guestStats.rating - 1000,
-              streak: guestStats.currentStreak
-            });
-          }
-          setShowVictory(true);
-          setVictoryShownThisSession(true);
-          sessionStorage.setItem(`victory_shown_${puzzle.id}`, '1');
-        }, 500);
+      // Restore saved victory stats if available
+      if (completion.victoryStats) {
+        setVictoryStats(completion.victoryStats);
       }
+      
+      // Don't auto-show victory popup for already completed puzzles
+      // User can click Share button to view results
       return;
     }
 
@@ -500,18 +491,26 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     setElapsedTime(finalTimeRef.current);
     setIsCompleting(true);
     setIsCompleted(true);
-
-    savePuzzleCompletion(puzzle.id, finalTimeRef.current, hintsUsed, moveSequence);
     
     try {
+      let newVictoryStats: VictoryStats | null = null;
+      
       if (!user) {
+        // For guest users, calculate stats synchronously
         const guestStats = updateGuestStats(puzzle.id, finalTimeRef.current, hintsUsed);
-        setVictoryStats({
+        newVictoryStats = {
           rating: guestStats.rating,
           ratingChange: guestStats.rating - 1000,
           streak: guestStats.currentStreak
-        });
+        };
+        setVictoryStats(newVictoryStats);
+        
+        // Save completion with stats immediately (synchronous)
+        savePuzzleCompletion(puzzle.id, finalTimeRef.current, hintsUsed, moveSequence, newVictoryStats);
       } else if (onComplete) {
+        // For logged-in users, save completion first (stats not ready yet)
+        savePuzzleCompletion(puzzle.id, finalTimeRef.current, hintsUsed, moveSequence);
+        
         let currentStats = {
           rating: 1000,
           previousRating: 1000,
@@ -531,11 +530,20 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           console.error('Error updating stats:', error);
         }
 
-        setVictoryStats({
+        newVictoryStats = {
           rating: currentStats.rating,
           ratingChange: currentStats.rating - currentStats.previousRating,
           streak: currentStats.currentStreak
-        });
+        };
+        setVictoryStats(newVictoryStats);
+        
+        // Update completion with stats after async calculation
+        if (newVictoryStats) {
+          updatePuzzleCompletionStats(puzzle.id, newVictoryStats);
+        }
+      } else {
+        // Fallback: save completion without stats
+        savePuzzleCompletion(puzzle.id, finalTimeRef.current, hintsUsed, moveSequence);
       }
       
       setTimeout(() => {
@@ -544,6 +552,8 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       }, 500);
     } catch (error) {
       console.error('Error handling puzzle completion:', error);
+      // Ensure completion is saved even if stats fail
+      savePuzzleCompletion(puzzle.id, finalTimeRef.current, hintsUsed, moveSequence);
       setProcessingVictory(false);
     }
   };
@@ -563,6 +573,20 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
     
     return styles;
   };
+
+  const handleShareClick = useCallback(() => {
+    // Ensure victory stats are loaded (should already be set when puzzle is loaded as completed)
+    const completion = getPuzzleCompletion(puzzle.id);
+    if (completion?.victoryStats && !victoryStats) {
+      // Restore stats if not already set
+      setVictoryStats(completion.victoryStats);
+    }
+    
+    // Show victory popup (stats should be available from initial load or just restored above)
+    if (victoryStats || completion?.victoryStats) {
+      setShowVictory(true);
+    }
+  }, [puzzle.id, victoryStats]);
 
   const generateShareGrid = useCallback(() => {
     const emojiMap = {
@@ -721,6 +745,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
           onShowHint={showHint}
           hintsUsed={hintsUsed}
           isCompleted={isCompleted}
+          onShare={isCompleted ? handleShareClick : undefined}
         />
 
         {/* Progress Grid */}
@@ -813,6 +838,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
               onShowHint={showHint}
               hintsUsed={hintsUsed}
               isCompleted={isCompleted}
+              onShare={isCompleted ? handleShareClick : undefined}
             />
           </div>
         </div>
@@ -865,14 +891,22 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
             // Close victory modal first
             setShowVictory(false);
             
-            // Check if banner popup has been shown this session (once per session)
-            const bannerShown = sessionStorage.getItem('banner_popup_shown');
-            if (!bannerShown) {
-              // Small delay to ensure victory modal closes smoothly
-              setTimeout(() => {
-                setShowBannerPopup(true);
-                sessionStorage.setItem('banner_popup_shown', '1');
-              }, 300);
+            // Only show banner popup if this is the first completion (not from share button)
+            // Check if puzzle was just completed vs already completed
+            const completion = getPuzzleCompletion(puzzle.id);
+            const justCompleted = completion && 
+              new Date(completion.completedAt).getTime() > Date.now() - 60000; // Completed within last minute
+            
+            if (justCompleted) {
+              // Check if banner popup has been shown this session (once per session)
+              const bannerShown = sessionStorage.getItem('banner_popup_shown');
+              if (!bannerShown) {
+                // Small delay to ensure victory modal closes smoothly
+                setTimeout(() => {
+                  setShowBannerPopup(true);
+                  sessionStorage.setItem('banner_popup_shown', '1');
+                }, 300);
+              }
             }
           }}
           rating={victoryStats.rating}

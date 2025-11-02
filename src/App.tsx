@@ -20,8 +20,6 @@ import { HiddenGemsSection } from './components/HiddenGemsSection';
 
 type Puzzle = Database['public']['Tables']['puzzles']['Row'];
 
-const POLL_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
-
 function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
@@ -31,7 +29,6 @@ function App() {
   const [nextRotation, setNextRotation] = useState<string | null>(null);
   const { user, setUser } = useAuthStore();
   const { isDarkMode } = useTheme(); // Initialize theme
-  const lastPollTimeRef = useRef(Date.now());
   const currentPuzzleIdRef = useRef<string | null>(null);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const navigate = useNavigate();
@@ -48,23 +45,20 @@ function App() {
       setError(null);
       setLoading(true);
       
-      const now = Date.now();
-      if (force || now - lastPollTimeRef.current >= POLL_INTERVAL) {
-        const response = await getDailyPuzzle();
-        console.log('Fetched puzzle data:', response); // Debug log
-        
-        if (response.puzzle && response.puzzle.fen && response.puzzle.pgn) {
-          if (force || !currentPuzzleIdRef.current || response.puzzle.id !== currentPuzzleIdRef.current) {
-            console.log('Setting new puzzle:', response.puzzle); // Debug log
-            setCurrentPuzzle(response.puzzle);
-            setNextRotation(response.next_rotation);
-            currentPuzzleIdRef.current = response.puzzle.id;
-          }
-        } else {
-          console.error('Invalid puzzle data:', response);
-          setError('Invalid puzzle data received. Please try again later.');
+      const response = await getDailyPuzzle();
+      console.log('Fetched puzzle data:', response); // Debug log
+      
+      if (response.puzzle && response.puzzle.fen && response.puzzle.pgn) {
+        // Only update if puzzle ID changed or it's a force fetch (initial load)
+        if (force || !currentPuzzleIdRef.current || response.puzzle.id !== currentPuzzleIdRef.current) {
+          console.log('Setting new puzzle:', response.puzzle); // Debug log
+          setCurrentPuzzle(response.puzzle);
+          setNextRotation(response.next_rotation);
+          currentPuzzleIdRef.current = response.puzzle.id;
         }
-        lastPollTimeRef.current = now;
+      } else {
+        console.error('Invalid puzzle data:', response);
+        setError('Invalid puzzle data received. Please try again later.');
       }
     } catch (error) {
       console.error('Error in fetchPuzzle:', error);
@@ -82,23 +76,24 @@ function App() {
     return () => subscription.unsubscribe();
   }, [setUser]);
 
+  // Initial fetch on mount
   useEffect(() => {
-    let pollInterval: number;
+    fetchPuzzle(true);
+  }, [fetchPuzzle]);
 
-    async function initialFetch() {
-      await fetchPuzzle(true);
-    }
+  // Check for puzzle changes when page becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      // Check for puzzle change when user returns to the tab
+      if (!document.hidden && currentPuzzleIdRef.current) {
+        fetchPuzzle();
+      }
+    };
 
-    initialFetch();
-
-    pollInterval = window.setInterval(() => {
-      fetchPuzzle();
-    }, POLL_INTERVAL);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      if (pollInterval) {
-        window.clearInterval(pollInterval);
-      }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [fetchPuzzle]);
 

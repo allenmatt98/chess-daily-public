@@ -1,11 +1,18 @@
 import { ChessMove } from '../types';
 
+export interface VictoryStats {
+  rating: number;
+  ratingChange: number;
+  streak: number;
+}
+
 interface PuzzleCompletion {
   puzzleId: string;
   completedAt: string;
   timeTaken: number;
   hintsUsed: number;
   moves: ChessMove[];
+  victoryStats?: VictoryStats;
 }
 
 const STORAGE_KEY = 'puzzle_completions';
@@ -14,15 +21,19 @@ export function savePuzzleCompletion(
   puzzleId: string,
   timeTaken: number,
   hintsUsed: number,
-  moves: ChessMove[]
+  moves: ChessMove[],
+  victoryStats?: VictoryStats
 ): void {
   try {
+    // Check if completion already exists to preserve victory stats
+    const existing = getPuzzleCompletion(puzzleId);
     const completion: PuzzleCompletion = {
       puzzleId,
-      completedAt: new Date().toISOString(),
+      completedAt: existing?.completedAt || new Date().toISOString(),
       timeTaken,
       hintsUsed,
-      moves
+      moves,
+      victoryStats: victoryStats || existing?.victoryStats
     };
 
     localStorage.setItem(
@@ -31,6 +42,27 @@ export function savePuzzleCompletion(
     );
   } catch (error) {
     console.error('Error saving puzzle completion:', error);
+  }
+}
+
+export function updatePuzzleCompletionStats(
+  puzzleId: string,
+  victoryStats: VictoryStats
+): void {
+  try {
+    const existing = getPuzzleCompletion(puzzleId);
+    if (existing) {
+      const updated: PuzzleCompletion = {
+        ...existing,
+        victoryStats
+      };
+      localStorage.setItem(
+        `${STORAGE_KEY}_${puzzleId}`,
+        JSON.stringify(updated)
+      );
+    }
+  } catch (error) {
+    console.error('Error updating puzzle completion stats:', error);
   }
 }
 
