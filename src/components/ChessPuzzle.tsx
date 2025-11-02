@@ -575,18 +575,42 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   };
 
   const handleShareClick = useCallback(() => {
-    // Ensure victory stats are loaded (should already be set when puzzle is loaded as completed)
+    // Get completion data to restore stats
     const completion = getPuzzleCompletion(puzzle.id);
-    if (completion?.victoryStats && !victoryStats) {
-      // Restore stats if not already set
-      setVictoryStats(completion.victoryStats);
+    
+    if (!completion) {
+      console.warn('No completion data found for puzzle:', puzzle.id);
+      return;
     }
     
-    // Show victory popup (stats should be available from initial load or just restored above)
-    if (victoryStats || completion?.victoryStats) {
-      setShowVictory(true);
+    // Determine which stats to use (prefer completion stats as source of truth)
+    let statsToUse: { rating: number; ratingChange: number; streak: number } | null = null;
+    
+    if (completion.victoryStats) {
+      statsToUse = completion.victoryStats;
+    } else if (victoryStats) {
+      statsToUse = victoryStats;
+    } else if (!user) {
+      // Fallback: calculate stats for guest users
+      const guestStats = getGuestStats();
+      statsToUse = {
+        rating: guestStats.rating,
+        ratingChange: guestStats.rating - 1000,
+        streak: guestStats.currentStreak
+      };
     }
-  }, [puzzle.id, victoryStats]);
+    
+    // Set stats first, then show popup (ensures both states are set)
+    if (statsToUse) {
+      setVictoryStats(statsToUse);
+      // Use setTimeout to ensure state update completes before showing popup
+      setTimeout(() => {
+        setShowVictory(true);
+      }, 0);
+    } else {
+      console.warn('No victory stats available to share');
+    }
+  }, [puzzle.id, user, victoryStats]);
 
   const generateShareGrid = useCallback(() => {
     const emojiMap = {
