@@ -7,6 +7,7 @@ import { HintComponent } from './HintComponent';
 import { UserStats } from './UserStats';
 import { AuthPrompt } from './AuthPrompt';
 import { AffiliateBanner } from './AffiliateBanner';
+import { BannerPopup } from './BannerPopup';
 import { useAuthStore } from '../store/authStore';
 import { useTheme } from '../hooks/useTheme';
 import { updateGuestStats } from '../lib/guestStats';
@@ -47,6 +48,7 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [showVictory, setShowVictory] = useState(false);
+  const [showBannerPopup, setShowBannerPopup] = useState(false);
   const [victoryStats, setVictoryStats] = useState<{
     rating: number;
     ratingChange: number;
@@ -859,13 +861,32 @@ export function ChessPuzzle({ puzzle, onComplete }: ChessPuzzleProps) {
       {showVictory && victoryStats && (
         <VictoryCelebration
           elapsedTime={finalTimeRef.current}
-          onComplete={() => setShowVictory(false)}
+          onComplete={() => {
+            // Close victory modal first
+            setShowVictory(false);
+            
+            // Check if banner popup has been shown this session (once per session)
+            const bannerShown = sessionStorage.getItem('banner_popup_shown');
+            if (!bannerShown) {
+              // Small delay to ensure victory modal closes smoothly
+              setTimeout(() => {
+                setShowBannerPopup(true);
+                sessionStorage.setItem('banner_popup_shown', '1');
+              }, 300);
+            }
+          }}
           rating={victoryStats.rating}
           ratingChange={victoryStats.ratingChange}
           streak={victoryStats.streak}
           shareGridData={generateShareGrid()}
         />
       )}
+
+      {/* Banner Popup - shown after victory modal */}
+      <BannerPopup
+        isOpen={showBannerPopup}
+        onClose={() => setShowBannerPopup(false)}
+      />
     </div>
   );
 }
