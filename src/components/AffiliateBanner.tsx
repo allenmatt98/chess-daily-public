@@ -7,40 +7,28 @@ interface AffiliateBannerProps {
 export function AffiliateBanner({ className = '' }: AffiliateBannerProps) {
   return (
     <div className={`affiliate-banner-container ${className}`}>
-      {/* Mobile Banner - 728x90 - Hidden on desktop */}
-      <div className="block lg:hidden">
+      {/* Chess Store Banner - Dynamic width for both mobile and desktop */}
+      <div className="w-full">
         <a 
-          href="https://chess-teacher.com/affiliates/idevaffiliate.php?id=2999_125_1_72" 
+          href="https://www.linkconnector.com/ta.php?lc=168677140131005057&lcpt=0&lcpf=3" 
           target="_blank" 
           rel="noopener noreferrer"
           className="block w-full"
         >
           <img 
             style={{ border: '0px' }} 
-            src="/affiliate-banners/Masterclass-728x90.jpg" 
-            width="728" 
-            height="90" 
-            alt="Free Chess Masterclass - Improve at Chess Instantly!"
+            src="/affiliate-banners/chessstorebanner.png" 
+            alt="The Chess Store - Chess Sets, Personalized Sets, Clocks"
             className="w-full h-auto rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
+            loading="lazy"
           />
-        </a>
-      </div>
-
-      {/* Desktop Banner - 336x280 - Hidden on mobile */}
-      <div className="hidden lg:block">
-        <a 
-          href="https://chess-teacher.com/affiliates/idevaffiliate.php?id=2999_125_1_70" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="block"
-        >
           <img 
-            style={{ border: '0px' }} 
-            src="/affiliate-banners/Masterclass-336x280.jpg" 
-            width="336" 
-            height="280" 
-            alt="Free Chess Masterclass - Improve at Chess Instantly!"
-            className="w-full h-auto rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
+            src="https://www.linkconnector.com/traffic_record.php?lc=168677140131005057" 
+            border="0" 
+            width="1" 
+            height="1" 
+            alt=""
+            style={{ display: 'none' }}
           />
         </a>
       </div>
